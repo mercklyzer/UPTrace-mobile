@@ -1,6 +1,7 @@
 const initialState = {
     // to be filled out
-    token: null
+    token: null,
+    user: null
 }
 
 export default (state = initialState, action) => {
