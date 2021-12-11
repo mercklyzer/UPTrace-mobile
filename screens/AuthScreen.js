@@ -6,12 +6,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment'
 import Colors from '../constants/Colors'
 import { useDispatch, useSelector } from "react-redux";
+import * as authActions from '../store/actions/auth'
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE'
 
 const formReducer = (state, action) => {
     if(action.type == FORM_INPUT_UPDATE){
-        console.log(action.input);
 
         const updatedValues = {
             ...state.inputValues,
@@ -57,6 +57,7 @@ const AuthScreen = props => {
     const dispatch = useDispatch()
 
     const [error,setError] = useState()
+    const [showOtp, setShowOtp] = useState(false)
 
     const [formState, dispatchFormState] = useReducer(formReducer, {
         inputValues: {
@@ -66,7 +67,8 @@ const AuthScreen = props => {
             role: 'ordinary',
             start_time: '',
             end_time: '',
-            way_of_interview: 'One at a time'           
+            way_of_interview: 'One at a time',
+            otp: ''       
         },
         inputValidities: {
             contact_num: false,
@@ -75,7 +77,8 @@ const AuthScreen = props => {
             role: true,
             start_time: false,
             end_time: false,
-            way_of_interview: true  
+            way_of_interview: true,
+            otp: false
         },
         formIsValid: false
     })
@@ -105,130 +108,189 @@ const AuthScreen = props => {
     };
 
     const onEndTimeChange = (event, selectedDate) => {
-        console.log("onchange");
         setEndShow(Platform.OS === 'ios');
         setEndText(moment(selectedDate).format("hh:mm A")) 
         inputChangeHandler('end_time', moment(selectedDate).format("HH:mm"), true)
       };
     
-      const showTimepicker = (field) => {
-          if(field === 'start'){
-            setStartShow(true)
-          }
-          else{
-            setEndShow(true)
-          }
-      };
+    const showTimepicker = (field) => {
+        if(field === 'start'){
+        setStartShow(true)
+        }
+        else{
+        setEndShow(true)
+        }
+    };
 
-    console.log(formState.inputValidities);
+    const requestOtp = async () => {
+        try{
+            await dispatch(authActions.requestOtp(formState.inputValues['contact_num']))
+            .then((message) => {
+                console.log(message);
+                if(message === "You may now input the OTP."){
+                    setShowOtp(true)
+                }
+            })
+        }
+        catch(err){
+            console.log(err.message);
+            if(err.message === 'You can request again after 5 minutes.'){
+                setShowOtp(true)
+            }
+        }
+    }
+
+    const signup = async () => {
+        try{
+            await dispatch(authActions.signup(formState.inputValues))
+            .then((message) => {
+                console.log(message);
+                props.navigation.navigate('Content')
+            })
+        }
+        catch(err){
+            console.log(err.message);
+        }
+    }
+
+    const signupHandler = () => {
+        console.log("show otp: ", showOtp);
+        if(!showOtp){
+            requestOtp()
+        }
+        else{
+            signup()
+        }
+    }
+
     let passwordMatch = formState.inputValidities['password'] && formState.inputValidities['confirm_password']
     let validTime = formState.inputValidities['start_time'] && formState.inputValidities['end_time']
 
     return (
-        <View behavior='padding' style={styles.screen}>
+        <View style={styles.screen}>
             <Card style={styles.authContainer}>
                 <ScrollView>
-                    <Input 
-                        id='contact_num'
-                        label='Contact Number'
+                    {showOtp && <Input 
+                        id='otp'
+                        label='OTP Number'
                         keyboardType='phone-pad'
                         required
+                        maxLength={6}
+                        minLength={6}
                         autoCapitalize="none"
-                        errorText="Please enter a valid phone number."
+                        errorText="Please enter a valid OTP."
                         onInputChange={inputChangeHandler}
                         initialValue=''
-                    />
-                    <Input 
-                        id='password'
-                        label='Password'
-                        keyboardType='default'
-                        secureTextEntry={true}
-                        required
-                        autoCapitalize="none"
-                        errorText="Please enter a valid password."
-                        forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
-                        onInputChange={inputChangeHandler}
-                        initialValue=''
-                    />
-                    <Input 
-                        id='confirm_password'
-                        label='Confirm Password'
-                        keyboardType='default'
-                        secureTextEntry={true}
-                        required
-                        autoCapitalize="none"
-                        errorText="Please enter a valid password."
-                        forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
-                        onInputChange={inputChangeHandler}
-                        initialValue=''
-                    />
+                    />}
+                    {!showOtp && <View>                  
+                        <Input 
+                            id='contact_num'
+                            label='Contact Number'
+                            keyboardType='phone-pad'
+                            required
+                            autoCapitalize="none"
+                            minLength={11}
+                            maxLength={11}
+                            errorText="Please enter a valid phone number."
+                            onInputChange={inputChangeHandler}
+                            initialValue={formState.inputValues['contact_num']}
+                            initiallyValid={formState.inputValidities['contact_num']}
+                        />
+                        <Input 
+                            id='password'
+                            label='Password'
+                            keyboardType='default'
+                            secureTextEntry={true}
+                            required
+                            autoCapitalize="none"
+                            errorText="Please enter a valid password."
+                            forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
+                            onInputChange={inputChangeHandler}
+                            initialValue={formState.inputValues['password']}
+                            initiallyValid={formState.inputValidities['password']}
+                        />
+                        <Input 
+                            id='confirm_password'
+                            label='Confirm Password'
+                            keyboardType='default'
+                            secureTextEntry={true}
+                            required
+                            autoCapitalize="none"
+                            errorText="Please enter a valid password."
+                            forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
+                            onInputChange={inputChangeHandler}
+                            initialValue={formState.inputValues['confirm_password']}
+                            initiallyValid={formState.inputValidities['confirm_password']}
+                        />
 
-                    <View style={styles.startAndEndTimeContainer}>
-                        <Text style={styles.formControlHeader}>Preferred Contact Time:</Text>
-                        <View style={styles.formGroup}>
-                            <Text style={styles.formControlLabel}>Start Time:</Text>
-                            <View style={styles.timeInput}>
-                                <Text style={styles.timeText}>{startText}</Text>
-                                <View style={styles.setButtonContainer}>
-                                    <Button onPress={() => showTimepicker('start')} title="Set" color={Colors.darkgreen}/>
-                                </View>
-                            </View>
-                            <View style={styles.errorContainer}>
-                                <Text style={styles.errorText}>{validTime || startText == ''? '' : 'Start time should be before the end time.'}</Text>
-                            </View>
-                        </View>
-                        <View style={styles.formGroup}>
-                            <Text style={styles.formControlLabel}>End Time:</Text>
-                            <View style={styles.timeInput}>
-                                <Text style={styles.timeText}>{endText}</Text>
-                                <View style={styles.setButtonContainer}>
-                                    <Button onPress={() => showTimepicker('end')} title="Set" color={Colors.darkgreen}/>
-                                </View>
-                            </View>
-                            <View style={styles.errorContainer}>
-                                <Text style={styles.errorText}>{validTime || endText === ''? '' : 'End time should be after the start time.'}</Text>
-                            </View>
-                        </View>
-                        {startShow && (
-                            <DateTimePicker
-                            testID="dateTimePickerStart"
-                            value={new Date(1)}
-                            mode="time"
-                            is24Hour={false}
-                            display="default"
-                            onChange={onStartTimeChange}
-                            />
-                        )}
-                        {endShow && (
-                            <DateTimePicker
-                            testID="dateTimePickerEnd"
-                            value={new Date(1)}
-                            mode="time"
-                            is24Hour={false}
-                            display="default"
-                            onChange={onEndTimeChange}
-                            />
-                        )}
-                        </View>
-                        <View>                       
+                        <View style={styles.startAndEndTimeContainer}>
+                            <Text style={styles.formControlHeader}>Preferred Contact Time:</Text>
                             <View style={styles.formGroup}>
-                                <Text style={styles.formControlLabel}>Preferred Way of Contact:</Text>
-                                <Picker
-                                    selectedValue={'One at a time'}
-                                    style={{ height: 50, width: 200}}
-                                    onValueChange={(itemValue, itemIndex) => inputChangeHandler('way_of_interview', itemValue, true)}
-                                >
-                                    <Picker.Item label="One at a time" value="One at a time" />
-                                    <Picker.Item label="All at once" value="All at once" />
-                                </Picker>
+                                <Text style={styles.formControlLabel}>Start Time:</Text>
+                                <View style={styles.timeInput}>
+                                    <Text style={styles.timeText}>{startText}</Text>
+                                    <View style={styles.setButtonContainer}>
+                                        <Button onPress={() => showTimepicker('start')} title="Set" color={Colors.darkgreen}/>
+                                    </View>
+                                </View>
+                                <View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>{validTime || startText == ''? '' : 'Start time should be before the end time.'}</Text>
+                                </View>
                             </View>
-                        </View>
+                            <View style={styles.formGroup}>
+                                <Text style={styles.formControlLabel}>End Time:</Text>
+                                <View style={styles.timeInput}>
+                                    <Text style={styles.timeText}>{endText}</Text>
+                                    <View style={styles.setButtonContainer}>
+                                        <Button onPress={() => showTimepicker('end')} title="Set" color={Colors.darkgreen}/>
+                                    </View>
+                                </View>
+                                <View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>{validTime || endText === ''? '' : 'End time should be after the start time.'}</Text>
+                                </View>
+                            </View>
+                            {startShow && (
+                                <DateTimePicker
+                                testID="dateTimePickerStart"
+                                value={new Date(1)}
+                                mode="time"
+                                is24Hour={false}
+                                display="default"
+                                onChange={onStartTimeChange}
+                                />
+                            )}
+                            {endShow && (
+                                <DateTimePicker
+                                testID="dateTimePickerEnd"
+                                value={new Date(1)}
+                                mode="time"
+                                is24Hour={false}
+                                display="default"
+                                onChange={onEndTimeChange}
+                                />
+                            )}
+                            </View>
+                            <View>                       
+                                <View style={styles.formGroup}>
+                                    <Text style={styles.formControlLabel}>Preferred Way of Contact:</Text>
+                                    <Picker
+                                        selectedValue={'One at a time'}
+                                        style={{ height: 50, width: 200}}
+                                        onValueChange={(itemValue, itemIndex) => inputChangeHandler('way_of_interview', itemValue, true)}
+                                    >
+                                        <Picker.Item label="One at a time" value="One at a time" />
+                                        <Picker.Item label="All at once" value="All at once" />
+                                    </Picker>
+                                </View>
+                            </View>
+                        </View>}
 
+                        {/* just create different components for login */}
                         <View style={styles.wideButtonContainer}>
-                            <Button title="SIGNUP" color={Colors.maroon} onPress={() => console.log('')}/>
+                            <Button title="SIGNUP" color={Colors.maroon} onPress={signupHandler}/>
                         </View>
                         <View style={styles.wideButtonContainer}>
-                            <Button title="Go to Login" color={Colors.darkgreen}/>
+                            <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={() => setShowOtp(false)}/>
                         </View>
 
                 </ScrollView>
