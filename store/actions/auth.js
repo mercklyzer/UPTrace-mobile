@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export const SIGNUP = 'SIGNUP'
-// export const LOGIN = 'LOGIN'
+export const LOGIN = 'LOGIN'
 export const AUTHENTICATE = 'AUTHENTICATE'
 export const LOGOUT = 'LOGOUT'
 
@@ -81,43 +81,34 @@ export const signup = (signupObject) => {
     }
 }
 
-export const login = (email, password) => {
+export const login = (contactNum, password) => {
     return async dispatch => {
         const response = await fetch(
-            'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAS3_m_Ifo_3PV020yb5M9m-Fo-INv_HVM',
+            'http://10.0.2.2:3000/users/login',
             {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email,
-                    password: password,
-                    returnSecureToken: true
+                    contact_num: contactNum,
+                    password: password
                 })
             }
         )
 
         if(!response.ok){
-            // depends on your API
             const errorResData = await response.json()
-            const errorId = errorResData.error.message
-
-            let errorMessage = 'Something went wrong!'
-            if(errorId === 'EMAIL_NOT_FOUND'){
-                errorMessage = 'Email does not exist.'
-            }
-            if(errorId === 'INVALID_PASSWORD'){
-                errorMessage = 'Invalid password.'
-            }
-            console.log(errorResData);
+            const errorMessage = errorResData.error.message
 
             throw new Error(errorMessage)
         }
 
         const resData = await response.json()
         console.log(resData);
-        dispatch(authenticate(resData.localId, resData.idToken))
+        dispatch({type:LOGIN, token: resData.token})
+
+        return resData.message
         const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000)
         saveDataToStorage(resData.idToken, resData.localId, expirationDate)
     }

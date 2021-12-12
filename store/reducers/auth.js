@@ -1,4 +1,5 @@
 import { SIGNUP } from "../actions/auth"
+import { LOGIN } from "../actions/auth"
 
 const initialState = {
     // to be filled out
@@ -8,6 +9,10 @@ const initialState = {
 export default (state = initialState, action) => {
     switch(action.type){
         case SIGNUP:
+            return {
+                token: action.token,
+            }
+        case LOGIN:
             return {
                 token: action.token,
             }

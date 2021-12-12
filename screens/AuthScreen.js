@@ -1,5 +1,6 @@
 import React, { useCallback, useReducer, useState } from "react";
-import { Button, StyleSheet, Text, View, ScrollView, Picker, Alert } from "react-native";
+import { Button, StyleSheet, Text, View, ScrollView, Alert } from "react-native";
+import {Picker} from '@react-native-picker/picker'
 import Card from '../components/Card'
 import Input from "../components/Input";
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -10,7 +11,7 @@ import * as authActions from '../store/actions/auth'
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE'
 
-const formReducer = (state, action) => {
+const signupFormReducer = (state, action) => {
     if(action.type == FORM_INPUT_UPDATE){
 
         const updatedValues = {
@@ -53,13 +54,41 @@ const formReducer = (state, action) => {
     return state
 }
 
+const loginFormReducer = (state, action) => {
+    if(action.type == FORM_INPUT_UPDATE){
+
+        const updatedValues = {
+            ...state.inputValues,
+            [action.input]: action.value
+        }
+        
+        let updatedValidities = {
+            ...state.inputValidities,
+            [action.input]: action.isValid
+        }
+
+        let updatedFormIsValid = true
+        for(const key in updatedValidities){
+            updatedFormIsValid = updatedFormIsValid && updatedValidities[key]
+        }
+
+        return {
+            formIsValid: updatedFormIsValid,
+            inputValidities: updatedValidities,
+            inputValues: updatedValues,
+        }
+    }
+    return state
+}
+
 const AuthScreen = props => {   
     const dispatch = useDispatch()
+    const [isSignup, setIsSignup] = useState(true)
 
     const [error,setError] = useState()
     const [showOtp, setShowOtp] = useState(false)
 
-    const [formState, dispatchFormState] = useReducer(formReducer, {
+    const [signupFormState, dispatchSignupFormState] = useReducer(signupFormReducer, {
         inputValues: {
             contact_num: '',
             password: '',
@@ -83,16 +112,42 @@ const AuthScreen = props => {
         formIsValid: false
     })
 
-    const inputChangeHandler = useCallback(
+    const [loginFormState, dispatchLoginFormState] = useReducer(loginFormReducer, {
+        inputValues: {
+            contact_num: '',
+            password: '',    
+        },
+        inputValidities: {
+            contact_num: false,
+            password: false
+        },
+        formIsValid: false
+    })
+
+    const loginInputChangeHandler = useCallback(
         (inputIdentifier, inputValue, inputValidity) => {
 
-            dispatchFormState({
+            dispatchLoginFormState({
                 type: FORM_INPUT_UPDATE,
                 value: inputValue,
                 isValid: inputValidity,
                 input: inputIdentifier
             });
-        }, [dispatchFormState]
+        }, [dispatchLoginFormState]
+    );
+
+    
+
+    const inputChangeHandler = useCallback(
+        (inputIdentifier, inputValue, inputValidity) => {
+
+            dispatchSignupFormState({
+                type: FORM_INPUT_UPDATE,
+                value: inputValue,
+                isValid: inputValidity,
+                input: inputIdentifier
+            });
+        }, [dispatchSignupFormState]
     );
 
     // const [date, setDate] = useState(new Date(1));
@@ -124,7 +179,7 @@ const AuthScreen = props => {
 
     const requestOtp = async () => {
         try{
-            await dispatch(authActions.requestOtp(formState.inputValues['contact_num']))
+            await dispatch(authActions.requestOtp(signupFormState.inputValues['contact_num']))
             .then((message) => {
                 console.log(message);
                 if(message === "You may now input the OTP."){
@@ -140,9 +195,32 @@ const AuthScreen = props => {
         }
     }
 
+    const goBackOrLoginHandler = () => {
+        if(showOtp){
+            setShowOtp(false)
+        }
+        else{
+            setIsSignup(false)
+        }
+    }
+
     const signup = async () => {
         try{
-            await dispatch(authActions.signup(formState.inputValues))
+            await dispatch(authActions.signup(signupFormState.inputValues))
+            .then((message) => {
+                console.log(message);
+                props.navigation.navigate('Content')
+            })
+        }
+        catch(err){
+            console.log(err.message);
+        }
+    }
+
+    const loginHandler = async () => {
+        console.log("logging in");
+        try {
+            await dispatch(authActions.login(loginFormState.inputValues.contact_num, loginFormState.inputValues.password))
             .then((message) => {
                 console.log(message);
                 props.navigation.navigate('Content')
@@ -154,7 +232,7 @@ const AuthScreen = props => {
     }
 
     const signupHandler = () => {
-        console.log("show otp: ", showOtp);
+        console.log(signupFormState);
         if(!showOtp){
             requestOtp()
         }
@@ -163,12 +241,14 @@ const AuthScreen = props => {
         }
     }
 
-    let passwordMatch = formState.inputValidities['password'] && formState.inputValidities['confirm_password']
-    let validTime = formState.inputValidities['start_time'] && formState.inputValidities['end_time']
+    let passwordMatch = signupFormState.inputValidities['password'] && signupFormState.inputValidities['confirm_password']
+    let validTime = signupFormState.inputValidities['start_time'] && signupFormState.inputValidities['end_time']
 
     return (
         <View style={styles.screen}>
-            <Card style={styles.authContainer}>
+
+            
+           {isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
                     {showOtp && <Input 
                         id='otp'
@@ -193,8 +273,8 @@ const AuthScreen = props => {
                             maxLength={11}
                             errorText="Please enter a valid phone number."
                             onInputChange={inputChangeHandler}
-                            initialValue={formState.inputValues['contact_num']}
-                            initiallyValid={formState.inputValidities['contact_num']}
+                            initialValue={signupFormState.inputValues['contact_num']}
+                            initiallyValid={signupFormState.inputValidities['contact_num']}
                         />
                         <Input 
                             id='password'
@@ -206,8 +286,8 @@ const AuthScreen = props => {
                             errorText="Please enter a valid password."
                             forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
                             onInputChange={inputChangeHandler}
-                            initialValue={formState.inputValues['password']}
-                            initiallyValid={formState.inputValidities['password']}
+                            initialValue={signupFormState.inputValues['password']}
+                            initiallyValid={signupFormState.inputValidities['password']}
                         />
                         <Input 
                             id='confirm_password'
@@ -219,8 +299,8 @@ const AuthScreen = props => {
                             errorText="Please enter a valid password."
                             forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
                             onInputChange={inputChangeHandler}
-                            initialValue={formState.inputValues['confirm_password']}
-                            initiallyValid={formState.inputValidities['confirm_password']}
+                            initialValue={signupFormState.inputValues['confirm_password']}
+                            initiallyValid={signupFormState.inputValidities['confirm_password']}
                         />
 
                         <View style={styles.startAndEndTimeContainer}>
@@ -290,18 +370,60 @@ const AuthScreen = props => {
                             <Button title="SIGNUP" color={Colors.maroon} onPress={signupHandler}/>
                         </View>
                         <View style={styles.wideButtonContainer}>
-                            <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={() => setShowOtp(false)}/>
+                            <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler}/>
                         </View>
 
                 </ScrollView>
-            </Card>
+            </Card>}
+
+            {/* for login, use functions instead */}
+            {!isSignup && <Card style={styles.authContainer}>
+                <ScrollView>
+
+                    <View>                  
+                        <Input 
+                            id='contact_num'
+                            label='Contact Number'
+                            keyboardType='phone-pad'
+                            required
+                            autoCapitalize="none"
+                            minLength={11}
+                            maxLength={11}
+                            errorText="Please enter a valid phone number."
+                            onInputChange={loginInputChangeHandler}
+                            initialValue={loginFormState.inputValues['contact_num']}
+                            initiallyValid={loginFormState.inputValidities['contact_num']}
+                        />
+                        <Input 
+                            id='password'
+                            label='Password'
+                            keyboardType='default'
+                            secureTextEntry={true}
+                            required
+                            autoCapitalize="none"
+                            errorText="Please enter a valid password."
+                            onInputChange={loginInputChangeHandler}
+                            initialValue={loginFormState.inputValues['password']}
+                            initiallyValid={loginFormState.inputValidities['password']}
+                        />
+                    </View>
+
+                    <View style={styles.wideButtonContainer}>
+                        <Button title="LOGIN" color={Colors.maroon} onPress={loginHandler}/>
+                    </View>
+                    <View style={styles.wideButtonContainer}>
+                        <Button title="Go to Signup" color={Colors.darkgreen} onPress={() => setIsSignup(true)}/>
+                    </View>
+
+                </ScrollView>
+            </Card>}
         </View>
     )
 }
 
 AuthScreen.navigationOptions = navData => {
     return {
-        headerTitle: 'Signup/Login'
+        headerTitle: 'Authentication'
     }
 }
 
