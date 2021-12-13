@@ -241,8 +241,20 @@ const AuthScreen = props => {
         }
     }
 
+    const checkValidityExceptOtp = () => {
+        let formIsValid = true
+        for(const key in signupFormState.inputValidities){
+            if(key !== 'otp'){
+                formIsValid = formIsValid && signupFormState.inputValidities[key]
+            }
+        }
+        return formIsValid
+    }
+
     let passwordMatch = signupFormState.inputValidities['password'] && signupFormState.inputValidities['confirm_password']
     let validTime = signupFormState.inputValidities['start_time'] && signupFormState.inputValidities['end_time']
+
+    console.log(signupFormState);
 
     return (
         <View style={styles.screen}>
@@ -260,7 +272,8 @@ const AuthScreen = props => {
                         autoCapitalize="none"
                         errorText="Please enter a valid OTP."
                         onInputChange={inputChangeHandler}
-                        initialValue=''
+                        initialValue={signupFormState.inputValues['otp']}
+                        initiallyValid={signupFormState.inputValidities['otp']}
                     />}
                     {!showOtp && <View>                  
                         <Input 
@@ -354,7 +367,7 @@ const AuthScreen = props => {
                                 <View style={styles.formGroup}>
                                     <Text style={styles.formControlLabel}>Preferred Way of Contact:</Text>
                                     <Picker
-                                        selectedValue={'One at a time'}
+                                        selectedValue={signupFormState.inputValues['way_of_interview']}
                                         style={{ height: 50, width: 200}}
                                         onValueChange={(itemValue, itemIndex) => inputChangeHandler('way_of_interview', itemValue, true)}
                                     >
@@ -367,7 +380,11 @@ const AuthScreen = props => {
 
                         {/* just create different components for login */}
                         <View style={styles.wideButtonContainer}>
-                            <Button title="SIGNUP" color={Colors.maroon} onPress={signupHandler}/>
+                            <Button 
+                                title="SIGNUP" 
+                                color={Colors.maroon} onPress={signupHandler} 
+                                disabled={showOtp? !signupFormState.formIsValid : !checkValidityExceptOtp()}
+                            />
                         </View>
                         <View style={styles.wideButtonContainer}>
                             <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler}/>

@@ -53,9 +53,6 @@ const Input = props => {
         isValid = false;
         }
         dispatch({type: INPUT_CHANGE, value: text, isValid: isValid})
-    }
-
-    const lostFocusHandler = () => {
         dispatch({type: INPUT_BLUR})
     }
 
@@ -68,7 +65,6 @@ const Input = props => {
                 style={styles.input} 
                 value={inputState.value} 
                 onChangeText={textChangeHandler}
-                onBlur={lostFocusHandler}
 
             />
             {!inputState.isValid && inputState.touched && (
