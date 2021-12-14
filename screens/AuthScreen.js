@@ -438,7 +438,7 @@ const AuthScreen = props => {
                         {isLoading ? 
                             <ActivityIndicator size='small' color={Colors.orange}/>
                             :
-                            <Button title="LOGIN" color={Colors.maroon} onPress={loginHandler}/>
+                            <Button title="LOGIN" color={Colors.maroon} onPress={loginHandler} disabled={!loginFormState.formIsValid}/>
                         }
                     </View>
                     <View style={styles.wideButtonContainer}>
