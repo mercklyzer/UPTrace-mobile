@@ -1,5 +1,5 @@
 import React, { useCallback, useReducer, useState } from "react";
-import { Button, StyleSheet, Text, View, ScrollView, Alert } from "react-native";
+import { Button, StyleSheet, Text, View, ScrollView, Alert, ActivityIndicator } from "react-native";
 import {Picker} from '@react-native-picker/picker'
 import Card from '../components/Card'
 import Input from "../components/Input";
@@ -85,7 +85,7 @@ const AuthScreen = props => {
     const dispatch = useDispatch()
     const [isSignup, setIsSignup] = useState(true)
 
-    const [error,setError] = useState()
+    const [isLoading, setIsLoading] = useState(false)
     const [showOtp, setShowOtp] = useState(false)
 
     const [signupFormState, dispatchSignupFormState] = useReducer(signupFormReducer, {
@@ -192,6 +192,9 @@ const AuthScreen = props => {
             if(err.message === 'You can request again after 5 minutes.'){
                 setShowOtp(true)
             }
+            else{
+                Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
+            }
         }
     }
 
@@ -213,12 +216,13 @@ const AuthScreen = props => {
             })
         }
         catch(err){
+            Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
             console.log(err.message);
         }
     }
 
     const loginHandler = async () => {
-        console.log("logging in");
+        setIsLoading(true)
         try {
             await dispatch(authActions.login(loginFormState.inputValues.contact_num, loginFormState.inputValues.password))
             .then((message) => {
@@ -227,18 +231,21 @@ const AuthScreen = props => {
             })
         }
         catch(err){
+            Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
             console.log(err.message);
         }
+        setIsLoading(false)
     }
 
     const signupHandler = () => {
-        console.log(signupFormState);
+        setIsLoading(true)
         if(!showOtp){
             requestOtp()
         }
         else{
             signup()
         }
+        setIsLoading(false)
     }
 
     const checkValidityExceptOtp = () => {
@@ -253,8 +260,6 @@ const AuthScreen = props => {
 
     let passwordMatch = signupFormState.inputValidities['password'] && signupFormState.inputValidities['confirm_password']
     let validTime = signupFormState.inputValidities['start_time'] && signupFormState.inputValidities['end_time']
-
-    console.log(signupFormState);
 
     return (
         <View style={styles.screen}>
@@ -380,14 +385,18 @@ const AuthScreen = props => {
 
                         {/* just create different components for login */}
                         <View style={styles.wideButtonContainer}>
+                            {isLoading ? 
+                            <ActivityIndicator size='small' color={Colors.orange}/>
+                            :
                             <Button 
-                                title="SIGNUP" 
+                                title="SIGNUP"
                                 color={Colors.maroon} onPress={signupHandler} 
                                 disabled={showOtp? !signupFormState.formIsValid : !checkValidityExceptOtp()}
                             />
+                            }
                         </View>
                         <View style={styles.wideButtonContainer}>
-                            <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler}/>
+                            <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler} disabled={isLoading}/>
                         </View>
 
                 </ScrollView>
@@ -426,10 +435,14 @@ const AuthScreen = props => {
                     </View>
 
                     <View style={styles.wideButtonContainer}>
-                        <Button title="LOGIN" color={Colors.maroon} onPress={loginHandler}/>
+                        {isLoading ? 
+                            <ActivityIndicator size='small' color={Colors.orange}/>
+                            :
+                            <Button title="LOGIN" color={Colors.maroon} onPress={loginHandler}/>
+                        }
                     </View>
                     <View style={styles.wideButtonContainer}>
-                        <Button title="Go to Signup" color={Colors.darkgreen} onPress={() => setIsSignup(true)}/>
+                        <Button title="Go to Signup" color={Colors.darkgreen} onPress={() => setIsSignup(true)} disabled={isLoading}/>
                     </View>
 
                 </ScrollView>

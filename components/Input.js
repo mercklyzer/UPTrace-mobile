@@ -29,8 +29,6 @@ const Input = props => {
         touched: props.initialValue ? true : false
     })
 
-    console.log(`${props.label} is valid: ${inputState.isValid}`);
-
     const {onInputChange, id} = props
 
     useEffect(() => {
