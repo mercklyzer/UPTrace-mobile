@@ -5,12 +5,12 @@ export const LOGIN = 'LOGIN'
 export const AUTHENTICATE = 'AUTHENTICATE'
 export const LOGOUT = 'LOGOUT'
 
-export const authenticate = (userId, token) => {
-    return {type: AUTHENTICATE, userId:userId, token:token}
+export const authenticate = (user, token) => {
+    return {type: AUTHENTICATE, user:user, token:token}
 }
 
 export const requestOtp = (contactNum) => {
-    return async dispatch => {
+    return async () => {
         console.log("requesting otp");
         const response = await fetch(
             'http://10.0.2.2:3000/users/generate-otp',
@@ -34,14 +34,10 @@ export const requestOtp = (contactNum) => {
 
         const resData = await response.json()
         return resData.message
-
-        const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000)
-        saveDataToStorage(resData.idToken, resData.localId, expirationDate)
     }
 }
 
 export const signup = (signupObject) => {
-    console.log(signupObject.contact_num);
     return async dispatch => {
         const response = await fetch(
             'http://10.0.2.2:3000/users',
@@ -72,12 +68,8 @@ export const signup = (signupObject) => {
 
         const resData = await response.json()
         console.log(resData);
-        dispatch({type:SIGNUP, token: resData.token})
-        return resData.message
-
-        dispatch({type:SIGNUP, })
-        const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000)
-        saveDataToStorage(resData.idToken, resData.localId, expirationDate)
+        dispatch({type:SIGNUP, token: resData.token, user: resData.user})
+        saveDataToStorage(resData.token, resData.user)
     }
 }
 
@@ -106,11 +98,8 @@ export const login = (contactNum, password) => {
 
         const resData = await response.json()
         console.log(resData);
-        dispatch({type:LOGIN, token: resData.token})
-
-        return resData.message
-        const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000)
-        saveDataToStorage(resData.idToken, resData.localId, expirationDate)
+        dispatch({type:LOGIN, token: resData.token, user: resData.user})
+        saveDataToStorage(resData.token, resData.user)
     }
 }
 
@@ -118,10 +107,11 @@ export const logout = () => {
     return {type: LOGOUT}
 }
 
-const saveDataToStorage = (token, userId, expirationDate) => {
+const saveDataToStorage = (token, user) => {
+    const userStringify = JSON.stringify(user)
+
     AsyncStorage.setItem('userData', JSON.stringify({
         token: token, 
-        userId: userId,
-        expiryDate: expirationDate.toISOString()
+        user: userStringify
     }))
 }

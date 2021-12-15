@@ -138,7 +138,7 @@ const AuthScreen = props => {
 
     
 
-    const inputChangeHandler = useCallback(
+    const signupInputChangeHandler = useCallback(
         (inputIdentifier, inputValue, inputValidity) => {
 
             dispatchSignupFormState({
@@ -159,13 +159,13 @@ const AuthScreen = props => {
     const onStartTimeChange = (event, selectedDate) => {
         setStartShow(Platform.OS === 'ios');
         setStartText(moment(selectedDate).format("hh:mm A"))       
-        inputChangeHandler('start_time', moment(selectedDate).format("HH:mm"), true) 
+        signupInputChangeHandler('start_time', moment(selectedDate).format("HH:mm"), true) 
     };
 
     const onEndTimeChange = (event, selectedDate) => {
         setEndShow(Platform.OS === 'ios');
         setEndText(moment(selectedDate).format("hh:mm A")) 
-        inputChangeHandler('end_time', moment(selectedDate).format("HH:mm"), true)
+        signupInputChangeHandler('end_time', moment(selectedDate).format("HH:mm"), true)
       };
     
     const showTimepicker = (field) => {
@@ -178,13 +178,14 @@ const AuthScreen = props => {
     };
 
     const requestOtp = async () => {
+        setIsLoading(true)
         try{
             await dispatch(authActions.requestOtp(signupFormState.inputValues['contact_num']))
             .then((message) => {
-                console.log(message);
                 if(message === "You may now input the OTP."){
                     setShowOtp(true)
                 }
+                setIsLoading(false)
             })
         }
         catch(err){
@@ -195,6 +196,7 @@ const AuthScreen = props => {
             else{
                 Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
             }
+            setIsLoading(false)
         }
     }
 
@@ -208,16 +210,17 @@ const AuthScreen = props => {
     }
 
     const signup = async () => {
+        setIsLoading(true)
         try{
             await dispatch(authActions.signup(signupFormState.inputValues))
-            .then((message) => {
-                console.log(message);
+            .then(() => {
+                setIsLoading(false)
                 props.navigation.navigate('Content')
             })
         }
         catch(err){
             Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
-            console.log(err.message);
+            setIsLoading(false)
         }
     }
 
@@ -225,27 +228,25 @@ const AuthScreen = props => {
         setIsLoading(true)
         try {
             await dispatch(authActions.login(loginFormState.inputValues.contact_num, loginFormState.inputValues.password))
-            .then((message) => {
-                console.log(message);
+            .then(() => {
+                setIsLoading(false)
                 props.navigation.navigate('Content')
             })
         }
         catch(err){
             Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
-            console.log(err.message);
+            setIsLoading(false)
         }
-        setIsLoading(false)
     }
 
     const signupHandler = () => {
-        setIsLoading(true)
         if(!showOtp){
             requestOtp()
         }
         else{
             signup()
         }
-        setIsLoading(false)
+        console.log("set to false");
     }
 
     const checkValidityExceptOtp = () => {
@@ -276,7 +277,7 @@ const AuthScreen = props => {
                         minLength={6}
                         autoCapitalize="none"
                         errorText="Please enter a valid OTP."
-                        onInputChange={inputChangeHandler}
+                        onInputChange={signupInputChangeHandler}
                         initialValue={signupFormState.inputValues['otp']}
                         initiallyValid={signupFormState.inputValidities['otp']}
                     />}
@@ -290,7 +291,7 @@ const AuthScreen = props => {
                             minLength={11}
                             maxLength={11}
                             errorText="Please enter a valid phone number."
-                            onInputChange={inputChangeHandler}
+                            onInputChange={signupInputChangeHandler}
                             initialValue={signupFormState.inputValues['contact_num']}
                             initiallyValid={signupFormState.inputValidities['contact_num']}
                         />
@@ -303,7 +304,7 @@ const AuthScreen = props => {
                             autoCapitalize="none"
                             errorText="Please enter a valid password."
                             forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
-                            onInputChange={inputChangeHandler}
+                            onInputChange={signupInputChangeHandler}
                             initialValue={signupFormState.inputValues['password']}
                             initiallyValid={signupFormState.inputValidities['password']}
                         />
@@ -316,7 +317,7 @@ const AuthScreen = props => {
                             autoCapitalize="none"
                             errorText="Please enter a valid password."
                             forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
-                            onInputChange={inputChangeHandler}
+                            onInputChange={signupInputChangeHandler}
                             initialValue={signupFormState.inputValues['confirm_password']}
                             initiallyValid={signupFormState.inputValidities['confirm_password']}
                         />
@@ -374,7 +375,7 @@ const AuthScreen = props => {
                                     <Picker
                                         selectedValue={signupFormState.inputValues['way_of_interview']}
                                         style={{ height: 50, width: 200}}
-                                        onValueChange={(itemValue, itemIndex) => inputChangeHandler('way_of_interview', itemValue, true)}
+                                        onValueChange={(itemValue, itemIndex) => signupInputChangeHandler('way_of_interview', itemValue, true)}
                                     >
                                         <Picker.Item label="One at a time" value="One at a time" />
                                         <Picker.Item label="All at once" value="All at once" />
@@ -383,7 +384,6 @@ const AuthScreen = props => {
                             </View>
                         </View>}
 
-                        {/* just create different components for login */}
                         <View style={styles.wideButtonContainer}>
                             {isLoading ? 
                             <ActivityIndicator size='small' color={Colors.orange}/>
