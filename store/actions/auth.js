@@ -104,6 +104,7 @@ export const login = (contactNum, password) => {
 }
 
 export const logout = () => {
+    deleteDataInStorage()
     return {type: LOGOUT}
 }
 
@@ -114,4 +115,8 @@ const saveDataToStorage = (token, user) => {
         token: token, 
         user: userStringify
     }))
+}
+
+const deleteDataInStorage = () => {
+    AsyncStorage.removeItem('userData')
 }

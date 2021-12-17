@@ -1,4 +1,4 @@
-import { AUTHENTICATE ,SIGNUP, LOGIN } from "../actions/auth"
+import { AUTHENTICATE ,SIGNUP, LOGIN, LOGOUT } from "../actions/auth"
 
 const initialState = {
     // to be filled out
@@ -11,7 +11,7 @@ export default (state = initialState, action) => {
         case AUTHENTICATE:
             return {
                 token: action.token,
-                userId: action.user
+                user: action.user
             }
         case SIGNUP:
             return {
@@ -23,6 +23,9 @@ export default (state = initialState, action) => {
                 token: action.token,
                 user: action.user
             }
+
+        case LOGOUT:
+            return initialState
 
         default:
             return state

@@ -6,8 +6,8 @@ import Input from "../components/Input";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment'
 import Colors from '../constants/Colors'
-import { useDispatch, useSelector } from "react-redux";
 import * as authActions from '../store/actions/auth'
+import { useDispatch, useSelector } from "react-redux";
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE'
 
