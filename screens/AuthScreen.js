@@ -1,5 +1,5 @@
 import React, { useCallback, useReducer, useState } from "react";
-import { Button, StyleSheet, Text, View, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { Button, StyleSheet, Text, View, ScrollView, Alert, ActivityIndicator, Dimensions } from "react-native";
 import {Picker} from '@react-native-picker/picker'
 import Card from '../components/Card'
 import Input from "../components/Input";
@@ -291,6 +291,7 @@ const AuthScreen = props => {
                             minLength={11}
                             maxLength={11}
                             errorText="Please enter a valid phone number."
+                            forceErrorText=''
                             onInputChange={signupInputChangeHandler}
                             initialValue={signupFormState.inputValues['contact_num']}
                             initiallyValid={signupFormState.inputValidities['contact_num']}
@@ -332,9 +333,9 @@ const AuthScreen = props => {
                                         <Button onPress={() => showTimepicker('start')} title="Set" color={Colors.darkgreen}/>
                                     </View>
                                 </View>
-                                <View style={styles.errorContainer}>
-                                    <Text style={styles.errorText}>{validTime || startText == ''? '' : 'Start time should be before the end time.'}</Text>
-                                </View>
+                                {validTime || startText !== '' && (<View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>Start time should be before the end time.</Text>
+                                </View>)}
                             </View>
                             <View style={styles.formGroup}>
                                 <Text style={styles.formControlLabel}>End Time:</Text>
@@ -344,9 +345,9 @@ const AuthScreen = props => {
                                         <Button onPress={() => showTimepicker('end')} title="Set" color={Colors.darkgreen}/>
                                     </View>
                                 </View>
-                                <View style={styles.errorContainer}>
-                                    <Text style={styles.errorText}>{validTime || endText === ''? '' : 'End time should be after the start time.'}</Text>
-                                </View>
+                                {validTime || endText !== '' && (<View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>End time should be after the start time.</Text>
+                                </View>)}
                             </View>
                             {startShow && (
                                 <DateTimePicker
@@ -371,7 +372,7 @@ const AuthScreen = props => {
                             </View>
                             <View>                       
                                 <View style={styles.formGroup}>
-                                    <Text style={styles.formControlLabel}>Preferred Way of Contact:</Text>
+                                    <Text style={styles.formControlHeader}>Preferred Way of Contact:</Text>
                                     <Picker
                                         selectedValue={signupFormState.inputValues['way_of_interview']}
                                         style={{ height: 50, width: 200}}
@@ -416,6 +417,7 @@ const AuthScreen = props => {
                             minLength={11}
                             maxLength={11}
                             errorText="Please enter a valid phone number."
+                            forceErrorText=''
                             onInputChange={loginInputChangeHandler}
                             initialValue={loginFormState.inputValues['contact_num']}
                             initiallyValid={loginFormState.inputValidities['contact_num']}
@@ -464,7 +466,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     authContainer: {
-        width: '80%',
+        width: '90%',
         maxWidth: 400,
         height: '90%',
         maxHeight: 800,
@@ -474,21 +476,33 @@ const styles = StyleSheet.create({
         // height: 100
     },
     formGroup: {
-        marginTop: 8
+        // marginTop: 0
+        // borderColor: 'black',
+        // borderWidth: 2
     },  
     formControlHeader: {
-        marginTop: 50
+        fontFamily: 'roboto-medium',
+        color: Colors.darkgreen,
+        marginVertical: Dimensions.get('window').height > 800? 8: 4,
+        fontSize: Dimensions.get('window').width > 600? 22: 18,
+        marginTop: Dimensions.get('window').height > 800? 20: 16,
     },
     formControlLabel: {
-        marginVertical: 2
+        fontFamily: 'roboto-regular',
+        color: 'black',
+        marginBottom: Dimensions.get('window').height > 800? 8: 4,
+        fontSize: Dimensions.get('window').width > 600? 22: 18,
     },
     timeInput: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        // borderColor: 'red',
+        // borderWidth: 2
     },
     timeText: {
-        
+        fontFamily: 'roboto-italic',
+        fontSize: Dimensions.get('window').width > 600? 22: 16,
     },
     setButtonContainer: {
 
@@ -498,7 +512,7 @@ const styles = StyleSheet.create({
     },
     errorContainer: {
         marginVertical: 5
-      },
+    },
     errorText: {
         // fontFamily: 'open-sans',
         color: 'red',
