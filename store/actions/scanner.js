@@ -1,9 +1,11 @@
 export const ADD_LOG = 'ADD_LOG';
 
-export const addLog = (scan_date, room_id, userData, token) => {
+const url = 'http://10.0.2.2:3000';
+
+export const addLog = (userData, token, scan_date, room_id) => {
     return async dispatch => {
         const response = await fetch(
-            'http://10.0.2.2:3000/logs',
+            `${url}/logs`,
             {
                 method: 'POST',
                 headers: {
