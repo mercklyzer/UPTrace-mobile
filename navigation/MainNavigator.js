@@ -13,6 +13,7 @@ import SummaryScreen from '../screens/SummaryScreen'
 import {Ionicons, MaterialCommunityIcons, MaterialIcons} from '@expo/vector-icons'
 import Colors from '../constants/Colors'
 import { Text } from 'react-native'
+import StartupScreen from '../screens/StartupScreen'
 
 
 const defaultNavOptions = {
@@ -102,6 +103,7 @@ createBottomTabNavigator(tabScreenConfig, {
 
 const MainNavigator = createSwitchNavigator({
     // add StartUp Screen here for autologin if applicable
+    Startup: StartupScreen,
     Auth: AuthNavigator,
     Content: ContentNavigator
 })

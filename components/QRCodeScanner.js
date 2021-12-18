@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { View, Button, Text, StyleSheet, Alert, ActivityIndicator, Dimensions, Platform } from 'react-native';
+import { useDispatch, useSelector } from "react-redux";
+
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
+import moment from "moment";
 
 import Colors from '../constants/Colors';
+import * as scannerActions from '../store/actions/scanner';
 
 const QRCodeScanner = props => {
-    const [isLoading, setIsLoading] = useState(true);
     const [hasPermission, setHasPermission] = useState(null);
     const [camera, setCamera] = useState(null);
     const [scanned, setScanned] = useState(false);
+    const [isWaitingResponse, setIsWaitingResponse] = useState(false);
 
     const [imagePadding, setImagePadding] = useState(0);
     const [ratio, setRatio] = useState('4:3');  // default is 4:3
     const { height, width } = Dimensions.get('window');
     const screenRatio = height / width;
     const [isRatioSet, setIsRatioSet] =  useState(false);
+
+    const dispatch = useDispatch();
+    const userData = useSelector(state => state.auth.user);
+    const token = useSelector(state => state.auth.token);
 
     useEffect(() => {
         (async () => {
@@ -74,19 +82,25 @@ const QRCodeScanner = props => {
     };
 
     const scanQRHandler = async ({ type, data }) => {
+        // If the QR code scanned is valid, data === room_id
         setScanned(true);
-        // Verify if QR code is valid. If yes, show alert below, sumit POST request, then redirect. If not, show alert saying that QR code is invalid and try again. Need to setScanned(false) here.
-        // Show activity indicator while waiting for response from server hehe
-        Alert.alert('Successfully scanned QR code!', `Data: ${data}`, [{ text: 'Okay', onPress: props.switchTab }]);
+        setIsWaitingResponse(true);
+        try {
+            await dispatch(scannerActions.addLog(moment().unix(), data, userData, token))
+            .then((message) => {
+                console.log("room_id:", data);
+                Alert.alert('Success', "Successfully scanned QR code!", [{ text: 'Okay', onPress: props.switchTab }]);
+            })
+        } catch(err) {
+            console.log("error:", err);
+            Alert.alert('An error occurred', `${err}`, [{ text: 'Try Again', onPress: () => {
+                setScanned(false);
+                setIsWaitingResponse(false);
+            } }]);
+        }
+        // setIsWaitingResponse(false);
+        // console.log("iswaitingresponse:", isWaitingResponse);
     };
-
-    // if(isLoading) {
-    //     return (
-    //         <View style={styles.centered}>
-    //             <ActivityIndicator size='large' color={Colors.maroon} />
-    //         </View>
-    //     );
-    // }
 
     if(hasPermission === null) {
         return <Text>Requesting for camera permission.</Text>;
@@ -98,7 +112,7 @@ const QRCodeScanner = props => {
 
     return (
         <View style={StyleSheet.absoluteFillObject}>
-            <Camera
+            {!isWaitingResponse && <Camera
                 onCameraReady={setCameraReady}
                 ratio={ratio}
                 ref={(ref) => {
@@ -107,14 +121,10 @@ const QRCodeScanner = props => {
                 barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
                 onBarCodeScanned={scanned ? undefined : scanQRHandler}
                 style={styles.scanner}
-            />
-            {scanned && <Button
-                title={'Tap to Scan Again'}
-                color={Colors.primary}
-                onPress={() => {
-                    setScanned(false);
-                }}
             />}
+            {isWaitingResponse && <View style={styles.loadingIcon}>
+                <ActivityIndicator size='large' color={Colors.maroon} />
+            </View>}
         </View>
     );
 };
@@ -125,6 +135,11 @@ const styles = StyleSheet.create({
         // flex: 1
     },
     centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    loadingIcon: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
