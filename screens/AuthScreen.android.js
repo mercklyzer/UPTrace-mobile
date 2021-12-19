@@ -8,6 +8,7 @@ import moment from 'moment'
 import Colors from '../constants/Colors'
 import * as authActions from '../store/actions/auth'
 import { useDispatch, useSelector } from "react-redux";
+import DataPrivacyModal from '../components/DataPrivacyModal';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE'
 
@@ -87,6 +88,8 @@ const AuthScreen = props => {
 
     const [isLoading, setIsLoading] = useState(false)
     const [showOtp, setShowOtp] = useState(false)
+
+    const [visible, setVisible] = useState(false);
 
     const [signupFormState, dispatchSignupFormState] = useReducer(signupFormReducer, {
         inputValues: {
@@ -216,6 +219,7 @@ const AuthScreen = props => {
             .then(() => {
                 setIsLoading(false)
                 props.navigation.navigate('Content')
+                // setVisible(true);
             })
         }
         catch(err){
@@ -244,7 +248,8 @@ const AuthScreen = props => {
             requestOtp()
         }
         else{
-            signup()
+            // signup()
+            setVisible(true);
         }
         console.log("set to false");
     }
@@ -264,7 +269,12 @@ const AuthScreen = props => {
 
     return (
         <View style={styles.screen}>
-
+            <DataPrivacyModal
+                visible={visible}
+                closeModal={() => setVisible(false)}
+                onAgree={() => props.navigation.navigate('Content')}
+                onAgree={signup}
+            />
             
            {isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
@@ -402,6 +412,15 @@ const AuthScreen = props => {
                         <View style={styles.wideButtonContainer}>
                             <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler} disabled={isLoading}/>
                         </View>
+                        {/* <View style={styles.wideButtonContainer}>
+                            <Button
+                                title="Data Privacy Agreement"
+                                color={Colors.darkgreen}
+                                signupHandler={signupHandler}
+                                onPress={() => setVisible(true)}
+                                onAgree={() => props.navigation.navigate('Content')}
+                            />
+                        </View> */}
 
                 </ScrollView>
             </Card>}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, StyleSheet, Platform, TouchableOpacity, Button, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Modal, StyleSheet, Platform, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { SegmentedControls } from 'react-native-radio-buttons'
 import { useDispatch } from "react-redux";
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -253,7 +253,8 @@ const styles = StyleSheet.create({
     },
     heading: {
         fontFamily: 'roboto-bold',
-        fontSize: 20
+        fontSize: 20,
+        color: Colors.darkgreen
     },
     label: {
         fontFamily: 'roboto-regular',
