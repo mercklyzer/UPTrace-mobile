@@ -1,4 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Constants from "expo-constants";
+
+const { manifest } = Constants;
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
 export const SIGNUP = 'SIGNUP'
 export const LOGIN = 'LOGIN'
@@ -13,7 +18,7 @@ export const requestOtp = (contactNum) => {
     return async () => {
         console.log("requesting otp");
         const response = await fetch(
-            'http://10.0.2.2:3000/users/generate-otp',
+            `${uri}/users/generate-otp`,
             {
                 method: 'POST',
                 headers: {
@@ -40,7 +45,7 @@ export const requestOtp = (contactNum) => {
 export const signup = (signupObject) => {
     return async dispatch => {
         const response = await fetch(
-            'http://10.0.2.2:3000/users',
+            `${uri}/users`,
             {
                 method: 'POST',
                 headers: {
@@ -76,7 +81,7 @@ export const signup = (signupObject) => {
 export const login = (contactNum, password) => {
     return async dispatch => {
         const response = await fetch(
-            'http://10.0.2.2:3000/users/login',
+            `${uri}/users/login`,
             {
                 method: 'POST',
                 headers: {

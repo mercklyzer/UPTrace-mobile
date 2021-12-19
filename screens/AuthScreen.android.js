@@ -333,22 +333,11 @@ const AuthScreen = props => {
                                         <Button onPress={() => showTimepicker('start')} title="Set" color={Colors.darkgreen}/>
                                     </View>
                                 </View>
-                                {validTime || startText !== '' && (<View style={styles.errorContainer}>
+                                {!validTime && startText !== '' && (<View style={styles.errorContainer}>
                                     <Text style={styles.errorText}>Start time should be before the end time.</Text>
                                 </View>)}
                             </View>
-                            <View style={styles.formGroup}>
-                                <Text style={styles.formControlLabel}>End Time:</Text>
-                                <View style={styles.timeInput}>
-                                    <Text style={styles.timeText}>{endText}</Text>
-                                    <View style={styles.setButtonContainer}>
-                                        <Button onPress={() => showTimepicker('end')} title="Set" color={Colors.darkgreen}/>
-                                    </View>
-                                </View>
-                                {validTime || endText !== '' && (<View style={styles.errorContainer}>
-                                    <Text style={styles.errorText}>End time should be after the start time.</Text>
-                                </View>)}
-                            </View>
+                            
                             {startShow && (
                                 <DateTimePicker
                                 testID="dateTimePickerStart"
@@ -359,6 +348,20 @@ const AuthScreen = props => {
                                 onChange={onStartTimeChange}
                                 />
                             )}
+
+                            <View style={styles.formGroup}>
+                                <Text style={styles.formControlLabel}>End Time:</Text>
+                                <View style={styles.timeInput}>
+                                    <Text style={styles.timeText}>{endText}</Text>
+                                    <View style={styles.setButtonContainer}>
+                                        <Button onPress={() => showTimepicker('end')} title="Set" color={Colors.darkgreen}/>
+                                    </View>
+                                </View>
+                                {!validTime && endText !== '' && (<View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>End time should be after the start time.</Text>
+                                </View>)}
+                            </View>
+                            
                             {endShow && (
                                 <DateTimePicker
                                 testID="dateTimePickerEnd"

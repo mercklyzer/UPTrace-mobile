@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
         borderBottomWidth: 1,
         fontSize: Dimensions.get('window').width > 600? 22: 18,
+        marginBottom: Dimensions.get('window').height > 800? 14: 10,
     },
     errorContainer: {
         marginVertical: Dimensions.get('window').height > 800? 8: 4,
