@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, ScrollView, RefreshControl, View, Button, TouchableOpacity, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, ScrollView, RefreshControl, View, Image, ActivityIndicator } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
 import DiscloseModal from "../components/DiscloseModal";
 import Colors from "../constants/Colors";
 import * as discloseActions from '../store/actions/disclose';
+import CustomButton from "../components/CustomButton";
 
 const DiscloseScreen = props => {
     const [isCheckingStatus, setIsCheckingStatus] = useState(false);
@@ -67,7 +68,6 @@ const DiscloseScreen = props => {
 
     return (
         <ScrollView
-            contentContainerStyle={styles.screen}
             refreshControl={
                 <RefreshControl
                     refreshing={isCheckingStatus}
@@ -75,42 +75,54 @@ const DiscloseScreen = props => {
                 />
             }
         >
-            <DiscloseModal
-                visible={visible}
-                heading={heading}
-                status={status}
-                userData={userData}
-                token={token}
-                changeIsSubmitted={changeIsSubmitted}
-                closeModal={() => setVisible(false)}
-            />
-            <View style={styles.buttonContainer}>
-                <Button
-                    title="I suspect to be positive"
-                    color={Colors.maroon}
-                    disabled={isUserPositive}
-                    onPress={() => {
-                        setVisible(true);
-                        setHeading("I suspect to be positive");
-                        setStatus("suspected");
-                    }}
+            <View style={styles.screen}>
+                <View style={styles.logoContainer}>
+                    <Image source={require('../assets/images/uptrace-logo.png')} style={styles.logo} />
+                </View>
+                <View style={styles.buttonContainer}>
+                    <CustomButton
+                        heading="I suspect to be positive"
+                        headingFontSize={18}
+                        buttonColor={Colors.maroon}
+                        isDisabled={isUserPositive}
+                        onPressHandler={() => {
+                            setVisible(true);
+                            setHeading("I suspect to be positive")
+                            setStatus("suspected");
+                        }}
+                    />
+                </View>
+                <View style={styles.buttonContainer}>
+                    <CustomButton
+                        heading="I tested positive"
+                        headingFontSize={18}
+                        buttonColor={Colors.maroon}
+                        isDisabled={isUserPositive}
+                        onPressHandler={() => {
+                            setVisible(true);
+                            setHeading("I tested positive")
+                            setStatus("disclosed positive");
+                        }}
+                    />
+                </View>
+                <View style={styles.contentContainer}>
+                    <Text style={styles.contentHeading}>Some Title</Text>
+                    <Text style={styles.contentText}>Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium assumenda id, reprehenderit minima ipsam quidem, nemo veritatis sint ut perferendis nostrum temporibus fugiat qui dolorem vel fugit repellendus labore ipsa suscipit dolorum, adipisci aut totam omnis. Voluptas voluptatibus saepe magnam, magni possimus quibusdam! Quo dignissimos eos necessitatibus ut facilis et.</Text>
+                </View>
+                <View style={styles.contentContainer}>
+                    <Text style={styles.contentHeading}>Some Title</Text>
+                    <Text style={styles.contentText}>Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium assumenda id, reprehenderit minima ipsam quidem, nemo veritatis sint ut perferendis nostrum temporibus fugiat qui dolorem vel fugit repellendus labore ipsa suscipit dolorum, adipisci aut totam omnis. Voluptas voluptatibus saepe magnam, magni possimus quibusdam! Quo dignissimos eos necessitatibus ut facilis et.</Text>
+                </View>
+                <DiscloseModal
+                    visible={visible}
+                    heading={heading}
+                    status={status}
+                    userData={userData}
+                    token={token}
+                    changeIsSubmitted={changeIsSubmitted}
+                    closeModal={() => setVisible(false)}
                 />
             </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    title="I tested positive"
-                    color={Colors.maroon}
-                    disabled={isUserPositive}
-                    onPress={() => {
-                        setVisible(true);
-                        setHeading("I tested positive")
-                        setStatus("disclosed positive");
-                    }}
-                />
-            </View>
-            <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>How do I look on iOS?</Text>
-            </TouchableOpacity>
         </ScrollView>
     );
 }
@@ -119,26 +131,35 @@ const styles = StyleSheet.create({
     screen: {
         flexGrow: 1,
         alignItems: 'center',
-        justifyContent: 'center'
+        // justifyContent: 'center',
+        marginVertical: 30
+    },
+    logoContainer: {
+        width: 200,
+        height: 60,
+        marginBottom: 30
+    },
+    logo: {
+        flex: 1,
+        width: undefined,
+        height: undefined
     },
     buttonContainer: {
-        marginBottom: 10
+        marginBottom: 15
     },
-    button: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: Colors.maroon,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 3,
-        elevation: 5, // for android only
-        shadowColor: 'black',
-        shadowOpacity: 0.26,
-        shadowOffset: {width: 0, height: 2},
-        shadowRadius: 8,
+    contentContainer: {
+        alignSelf: 'flex-start',
+        marginHorizontal: 30,
+        marginTop: 30
     },
-    buttonText: {
-        color: 'white'
+    contentHeading: {
+        fontFamily: 'roboto-bold',
+        fontSize: 24,
+        color: Colors.maroon
+    },
+    contentText: {
+        fontFamily: 'roboto-regular',
+        fontSize: 16,
     }
 })
 

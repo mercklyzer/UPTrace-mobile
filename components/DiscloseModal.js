@@ -8,6 +8,7 @@ import moment from "moment";
 
 import Colors from '../constants/Colors';
 import * as discloseActions from '../store/actions/disclose';
+import CustomButton from './CustomButton';
 
 const DiscloseModal = props => {
     const [showModal, setShowModal] = useState(props.visible);
@@ -155,35 +156,55 @@ const DiscloseModal = props => {
                             </View>
                             {isSymptomatic === 'Yes'
                             ? (
-                                <View style={styles.calendarContainer}>
+                                <View>
                                     <Text style={styles.label}>When did your symptoms start? (Onset Date)</Text>
-                                    <Text style={styles.date}>{selectedDate && moment(selectedDate).format('MM/DD/YYYY')}</Text>
-                                    <Text style={styles.errorText}>{isSubmitted && selectedDate == null ? 'Please select a date.' : ''}</Text>
-                                    <View style={styles.datePickerButtonContainer}>
-                                        <Button
-                                            title={!selectedDate ? "Select date" : "Change date"}
-                                            color={Colors.darkgreen}
-                                            style={styles.datePickerButton}
-                                            onPress={() => setShowCalendar(true)}
+                                    {Platform.OS === 'android' && <View>
+                                        <View style={styles.dateInput}>
+                                            <Text style={styles.date}>{selectedDate ? moment(selectedDate).format('MM/DD/YYYY') : ''}</Text>
+                                            <View style={styles.datePickerButtonContainer}>
+                                                <CustomButton
+                                                    heading={!selectedDate ? "Select date" : "Change date"}
+                                                    headingFontSize={16}
+                                                    buttonColor={Colors.darkgreen}
+                                                    isDisabled={false}
+                                                    onPressHandler={() => setShowCalendar(true)}
+                                                />
+                                            </View>
+                                        </View>
+                                        <View>
+                                            {showCalendar && <DateTimePicker
+                                                testID="dateTimePicker"
+                                                value={new Date()}
+                                                mode={'date'}
+                                                display="default"
+                                                onChange={changeDateHandler}
+                                                maximumDate={new Date()}
+                                                minimumDate={new Date(2019, 11, 1)}
+                                            />}
+                                        </View>
+                                    </View>}
+                                    {Platform.OS === 'ios' && <View>
+                                        <DateTimePicker
+                                            testID="dateTimePicker"
+                                            value={new Date()}
+                                            mode={'date'}
+                                            display="default"
+                                            onChange={changeDateHandler}
+                                            maximumDate={new Date()}
+                                            minimumDate={new Date(2019, 11, 1)}
                                         />
-                                    </View>
-                                    {showCalendar && <DateTimePicker
-                                        testID="dateTimePicker"
-                                        value={new Date()}
-                                        mode={'date'}
-                                        display="default"
-                                        onChange={changeDateHandler}
-                                        maximumDate={new Date()}
-                                        minimumDate={new Date(2019, 11, 1)}
-                                    />}
+                                    </View>}
+                                    <Text style={styles.errorText}>{isSubmitted && selectedDate == null ? 'Please select a date.' : ''}</Text>
                                 </View>
                             )
                             : null}
                             {!isWaitingResponse && <View style={styles.submitContainer}>
-                                <Button
-                                    title="Submit"
-                                    color={Colors.maroon}
-                                    onPress={submitHandler}
+                                <CustomButton
+                                    heading="Submit"
+                                    headingFontSize={18}
+                                    buttonColor={Colors.maroon}
+                                    isDisabled={false}
+                                    onPressHandler={submitHandler}
                                 />
                             </View>}
                             {isWaitingResponse && <View style={{alignItems: 'flex-end'}}>
@@ -243,25 +264,20 @@ const styles = StyleSheet.create({
         color: 'red',
         marginTop: 5
     },
-    calendarContainer: {
-        width: '100%',
-        backgroundColor: 'white',
-        marginTop: 20
+    dateInput: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
     date: {
-        borderBottomWidth: 1,
-        borderColor: '#ccc',
-        fontSize: 16
+        fontSize: 16,
+        fontFamily: 'roboto-italic'
     },
     datePickerButtonContainer: {
-        marginTop: 10
-    },
-    datePickerButton: {
-        marginBottom: 10,
+        // marginTop: 10,
     },
     submitContainer: {
         alignItems: 'flex-end',
-        marginTop: 20
+        marginTop: 10
     }
 });
 
