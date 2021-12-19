@@ -219,7 +219,6 @@ const AuthScreen = props => {
             .then(() => {
                 setIsLoading(false)
                 props.navigation.navigate('Content')
-                // setVisible(true);
             })
         }
         catch(err){
@@ -240,6 +239,7 @@ const AuthScreen = props => {
         catch(err){
             Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
             setIsLoading(false)
+            setVisible(false);
         }
     }
 
@@ -272,7 +272,6 @@ const AuthScreen = props => {
             <DataPrivacyModal
                 visible={visible}
                 closeModal={() => setVisible(false)}
-                onAgree={() => props.navigation.navigate('Content')}
                 onAgree={signup}
             />
             
@@ -412,15 +411,6 @@ const AuthScreen = props => {
                         <View style={styles.wideButtonContainer}>
                             <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler} disabled={isLoading}/>
                         </View>
-                        {/* <View style={styles.wideButtonContainer}>
-                            <Button
-                                title="Data Privacy Agreement"
-                                color={Colors.darkgreen}
-                                signupHandler={signupHandler}
-                                onPress={() => setVisible(true)}
-                                onAgree={() => props.navigation.navigate('Content')}
-                            />
-                        </View> */}
 
                 </ScrollView>
             </Card>}

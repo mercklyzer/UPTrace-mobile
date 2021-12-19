@@ -8,6 +8,7 @@ import moment from 'moment'
 import Colors from '../constants/Colors'
 import * as authActions from '../store/actions/auth'
 import { useDispatch, useSelector } from "react-redux";
+import DataPrivacyModal from '../components/DataPrivacyModal';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE'
 
@@ -92,7 +93,7 @@ const AuthScreen = props => {
     const [isLoading, setIsLoading] = useState(false)
     const [showOtp, setShowOtp] = useState(false)
 
-
+    const [visible, setVisible] = useState(false);
 
     const [signupFormState, dispatchSignupFormState] = useReducer(signupFormReducer, {
         inputValues: {
@@ -214,6 +215,7 @@ const AuthScreen = props => {
         catch(err){
             Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
             setIsLoading(false)
+            setVisible(false);
         }
     }
 
@@ -237,7 +239,8 @@ const AuthScreen = props => {
             requestOtp()
         }
         else{
-            signup()
+            // signup()
+            setVisible(true);
         }
         console.log("set to false");
     }
@@ -278,7 +281,11 @@ const AuthScreen = props => {
 
     return (
         <View style={styles.screen}>
-
+            <DataPrivacyModal
+                visible={visible}
+                closeModal={() => setVisible(false)}
+                onAgree={signup}
+            />
             
            {isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
