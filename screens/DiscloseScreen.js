@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, ScrollView, RefreshControl, View, Button, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, ScrollView, RefreshControl, View, Button, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
 import DiscloseModal from "../components/DiscloseModal";
@@ -96,16 +96,21 @@ const DiscloseScreen = props => {
                     }}
                 />
             </View>
-            <Button
-                title="I tested positive"
-                color={Colors.maroon}
-                disabled={isUserPositive}
-                onPress={() => {
-                    setVisible(true);
-                    setHeading("I tested positive")
-                    setStatus("disclosed positive");
-                }}
-            />
+            <View style={styles.buttonContainer}>
+                <Button
+                    title="I tested positive"
+                    color={Colors.maroon}
+                    disabled={isUserPositive}
+                    onPress={() => {
+                        setVisible(true);
+                        setHeading("I tested positive")
+                        setStatus("disclosed positive");
+                    }}
+                />
+            </View>
+            <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>How do I look on iOS?</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 }
@@ -118,6 +123,22 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         marginBottom: 10
+    },
+    button: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: Colors.maroon,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 3,
+        elevation: 5, // for android only
+        shadowColor: 'black',
+        shadowOpacity: 0.26,
+        shadowOffset: {width: 0, height: 2},
+        shadowRadius: 8,
+    },
+    buttonText: {
+        color: 'white'
     }
 })
 
