@@ -1,12 +1,17 @@
+import Constants from "expo-constants";
+
+const { manifest } = Constants;
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+
 export const ADD_PATIENT = 'ADD_PATIENT';
 export const CHECK_IF_USER_IS_NEGATIVE = 'CHECK_IF_USER_IS_NEGATIVE';
 
-const url = 'http://10.0.2.2:3000';
 
 export const checkIfUserIsNegative = (contactNum, token) => {
     return async dispatch => {
         const response = await fetch(
-            `${url}/patients/${contactNum}/status`,
+            `${uri}/patients/${contactNum}/status`,
             {
                 method: 'GET',
                 headers: {
@@ -32,7 +37,7 @@ export const checkIfUserIsNegative = (contactNum, token) => {
 export const addPatient = (userData, token, formData) => {
     return async dispatch => {
         const response = await fetch(
-            `${url}/patients`,
+            `${uri}/patients`,
             {
                 method: 'POST',
                 headers: {

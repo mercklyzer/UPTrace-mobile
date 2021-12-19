@@ -1,11 +1,17 @@
+import Constants from "expo-constants";
+
+const { manifest } = Constants;
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+
 export const ADD_LOG = 'ADD_LOG';
 
-const url = 'http://10.0.2.2:3000';
+
 
 export const addLog = (userData, token, scan_date, room_id) => {
     return async dispatch => {
         const response = await fetch(
-            `${url}/logs`,
+            `${uri}/logs`,
             {
                 method: 'POST',
                 headers: {
