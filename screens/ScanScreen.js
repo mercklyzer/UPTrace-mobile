@@ -8,17 +8,14 @@ const ScanScreen = props => {
 
     useEffect(() => {
         const focusListener = props.navigation.addListener('didFocus', () => {
-            // console.log("currently focused!");
             setIsFocused(true);
         });
         
         const blurListener = props.navigation.addListener('willBlur', () => {
-            // console.log("will blur!");
             setIsFocused(false);
         });
 
         return () => {
-            // console.log("will remove listener!");
             focusListener.remove();
             blurListener.remove();
         };

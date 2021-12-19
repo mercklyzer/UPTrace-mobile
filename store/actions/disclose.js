@@ -57,7 +57,7 @@ export const addPatient = (userData, token, formData) => {
         }
 
         const resData = await response.json();
-        console.log("resData from addPatient:", resData);
+        // console.log("resData from addPatient:", resData);
         return resData;
     };
 };
