@@ -1,5 +1,7 @@
 import React, { useEffect, useReducer } from 'react'
-import { View, Text, TextInput, StyleSheet } from 'react-native'
+import { View, Text, TextInput, StyleSheet, Dimensions } from 'react-native'
+import { borderColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes'
+import Colors from '../constants/Colors'
 
 const INPUT_CHANGE = 'INPUT_CHANGE'
 const INPUT_BLUR = 'INPUT_BLUR'
@@ -63,17 +65,17 @@ const Input = props => {
                 style={styles.input} 
                 value={inputState.value} 
                 onChangeText={textChangeHandler}
-
             />
+
             {!inputState.isValid && inputState.touched && (
                 <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{props.errorText}</Text>
+                    <Text style={styles.errorText}>{props.errorText}</Text>
                 </View>
             )}
 
             {props.forceErrorText !== '' && inputState.touched && (
                 <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{props.forceErrorText}</Text>
+                    <Text style={styles.errorText}>{props.forceErrorText}</Text>
                 </View>
             )}
         </View>
@@ -82,23 +84,27 @@ const Input = props => {
 
 const styles = StyleSheet.create({
     formControl:{
-        width: '100%'
+        width: '100%',
     },
     label: {
-        // fontFamily: 'open-sans-bold',
-        marginVertical: 8
+        fontFamily: 'roboto-medium',
+        color: Colors.darkgreen,
+        marginVertical: Dimensions.get('window').height > 800? 8: 4,
+        fontSize: Dimensions.get('window').width > 600? 22: 18,
     },
     input: {
         paddingHorizontal: 2,
         paddingVertical: 5,
         borderBottomColor: '#ccc',
-        borderBottomWidth: 1
+        borderBottomWidth: 1,
+        fontSize: Dimensions.get('window').width > 600? 22: 18,
+        marginBottom: Dimensions.get('window').height > 800? 14: 10,
     },
     errorContainer: {
-        marginVertical: 5
-      },
+        marginVertical: Dimensions.get('window').height > 800? 8: 4,
+    },
     errorText: {
-        // fontFamily: 'open-sans',
+        fontFamily: 'roboto-regular',
         color: 'red',
         fontSize: 13
     }
