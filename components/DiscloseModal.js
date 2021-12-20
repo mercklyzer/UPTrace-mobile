@@ -15,7 +15,7 @@ const DiscloseModal = props => {
     const [showCalendar, setShowCalendar] = useState(false);
     const [condition, setCondition] = useState(null);
     const [isSymptomatic, setIsSymptomatic] = useState(null);
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isWaitingResponse, setIsWaitingResponse] = useState(false);
 
@@ -32,7 +32,7 @@ const DiscloseModal = props => {
     const resetModal = () => {
         setIsSubmitted(false);
         setIsSymptomatic(null);
-        setSelectedDate(null);
+        setSelectedDate(new Date());
     };
 
     useEffect(() => {
@@ -174,7 +174,7 @@ const DiscloseModal = props => {
                                         <View>
                                             {showCalendar && <DateTimePicker
                                                 testID="dateTimePicker"
-                                                value={new Date()}
+                                                value={selectedDate}
                                                 mode={'date'}
                                                 display="default"
                                                 onChange={changeDateHandler}
@@ -186,7 +186,7 @@ const DiscloseModal = props => {
                                     {Platform.OS === 'ios' && <View>
                                         <DateTimePicker
                                             testID="dateTimePicker"
-                                            value={new Date()}
+                                            value={selectedDate}
                                             mode={'date'}
                                             display="default"
                                             onChange={changeDateHandler}
