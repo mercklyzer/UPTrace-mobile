@@ -91,6 +91,17 @@ const AuthScreen = props => {
 
     const [visible, setVisible] = useState(false);
 
+    const [signupForm, setSignupForm] = useState({
+        contact_num: '',
+        password: '',
+        confirm_password: '',
+        role: 'ordinary',
+        start_time: '',
+        end_time: '',
+        way_of_interview: 'One at a time',
+        otp: ''
+    })
+
     const [signupFormState, dispatchSignupFormState] = useReducer(signupFormReducer, {
         inputValues: {
             contact_num: '',
