@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { Button, StyleSheet, Text, View, ScrollView, Alert, ActivityIndicator, Dimensions } from "react-native";
 import {Picker} from '@react-native-picker/picker'
 import Card from '../components/Card'
@@ -49,9 +49,14 @@ const AuthScreenSample = props => {
         otp: ''
     })
 
+    // this handles the dependency on setState
+    useEffect(() => {
+        formValidator(signupForm.password, 'password')
+        formValidator(signupForm.confirm_password, 'confirm_password')
+    }, [signupForm.password, signupForm.confirm_password])
+
     const signupInputChangeHandler = (text, field) => {
         text = textCleanHandler(text, field)
-        formValidator(text, field)
 
         setSignupFormTouch(form => {
             return {
@@ -66,12 +71,18 @@ const AuthScreenSample = props => {
                 [field]: text
             }
         })
+
+        // password and confirm password are handled using useEffect since they have dependency on setState
+        if(field !== 'password' && field != 'confirm_password'){
+            formValidator(text, field)
+        }
     }
 
     const textCleanHandler = (text, field) => {
         if(field === 'contact_num'){
             return text.replace(/[^0-9]/g, "")
         }
+        return text
     }
 
     const formValidator = (text, field) => {
@@ -81,6 +92,33 @@ const AuthScreenSample = props => {
                     return {
                         ...form,
                         [field]: 'Contact Number should be 09XXXXXXXXX.'
+                    }
+                })
+            }
+            else{
+                setSignupFormError((form) => {
+                    return {
+                        ...form,
+                        [field]: ''
+                    }
+                })
+            }
+        }
+        if(field === 'password' || field === 'confirm_password'){
+            if(!/([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,16})/g.test(text)){
+                setSignupFormError((form) => {
+                    return {
+                        ...form,
+                        [field]: `Password should be 8 to 16 alphanumeric or special characters.`
+                    }
+                })
+            }
+            else if(signupForm['password'] !== signupForm['confirm_password']){
+                setSignupFormError((form) => {
+                    return {
+                        ...form,
+                        ['password']: 'Passwords do not match.',
+                        ['confirm_password']: 'Passwords do not match.'
                     }
                 })
             }
@@ -124,39 +162,33 @@ const AuthScreenSample = props => {
                             keyboardType='phone-pad'
                             required
                             autoCapitalize="none"
-                            minLength={11}
-                            maxLength={11}
                             errorMessage={signupFormError['contact_num']}
                             onInputChange={signupInputChangeHandler}
                             value={signupForm['contact_num']}
                             touch={signupFormTouch['contact_num']}
                         />
-                        {/* <InputSample 
-                            id='password'
+                        <InputSample 
+                            field='password'
                             label='Password'
                             keyboardType='default'
                             secureTextEntry={true}
                             required
-                            autoCapitalize="none"
-                            errorText="Please enter a valid password."
-                            forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
+                            errorMessage={signupFormError['password']}
                             onInputChange={signupInputChangeHandler}
-                            initialValue={signupFormState.inputValues['password']}
-                            initiallyValid={signupFormState.inputValidities['password']}
+                            value={signupForm['password']}
+                            touch={signupFormTouch['password']}
                         />
                         <InputSample 
-                            id='confirm_password'
+                            field='confirm_password'
                             label='Confirm Password'
                             keyboardType='default'
                             secureTextEntry={true}
                             required
-                            autoCapitalize="none"
-                            errorText="Please enter a valid password."
-                            forceErrorText={passwordMatch? '' : 'Passwords do not match.'}
+                            errorMessage={signupFormError['confirm_password']}
                             onInputChange={signupInputChangeHandler}
-                            initialValue={signupFormState.inputValues['confirm_password']}
-                            initiallyValid={signupFormState.inputValidities['confirm_password']}
-                        /> */}
+                            value={signupForm['confirm_password']}
+                            touch={signupFormTouch['confirm_password']}
+                        />
                     </View>}
 
                     {/* <View style={styles.wideButtonContainer}>

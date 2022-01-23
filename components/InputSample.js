@@ -30,7 +30,7 @@ const Input = props => {
                 onChangeText={(text) => props.onInputChange(text, props.field)}
             />
 
-            {errorMessage!==''  && (
+            {errorMessage !=='' && touch && (
                 <View style={styles.errorContainer}>
                     <Text style={styles.errorText}>{errorMessage}</Text>
                 </View>
