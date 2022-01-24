@@ -299,6 +299,20 @@ const AuthScreenSample = props => {
                                 onChange={(event, selectedTime) => onTimeChange(event, selectedTime, 'end_time')}
                             />)}
                         </View>
+
+                        <View>                       
+                            <View style={styles.formGroup}>
+                                <Text style={styles.formControlHeader}>Preferred Way of Contact:</Text>
+                                <Picker
+                                    selectedValue={signupForm['way_of_interview']}
+                                    style={{ height: 50, width: 200}}
+                                    onValueChange={(itemValue, itemIndex) => signupInputChangeHandler(itemValue, 'way_of_interview')}
+                                >
+                                    <Picker.Item label="One at a time" value="One at a time" />
+                                    <Picker.Item label="All at once" value="All at once" />
+                                </Picker>
+                            </View>
+                        </View>
                         
                     </View>}
 
