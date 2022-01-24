@@ -6,12 +6,13 @@ import InputSample from "../components/InputSample";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment'
 import Colors from '../constants/Colors'
+import { useDispatch } from "react-redux";
+import * as authActions from '../store/actions/auth'
 
 import DataPrivacyModal from '../components/DataPrivacyModal';
 
-
-
-const AuthScreenSample = props => {   
+const AuthScreenSample = props => {  
+    const dispatch = useDispatch()
     const [isSignup, setIsSignup] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
     const [showOtp, setShowOtp] = useState(false)
@@ -34,7 +35,7 @@ const AuthScreenSample = props => {
         confirm_password: false,
         start_time: false,
         end_time: false,
-        way_of_interview: false,
+        way_of_interview: true,
         otp: false
     })
 
@@ -120,7 +121,7 @@ const AuthScreenSample = props => {
     }
 
     const textCleanHandler = (text, field) => {
-        if(field === 'contact_num'){
+        if(field === 'contact_num' || field === 'otp'){
             return text.replace(/[^0-9]/g, "")
         }
         return text
@@ -192,27 +193,112 @@ const AuthScreenSample = props => {
                 })
             }
         }
+        if(field === 'otp'){
+            if(!/^[0-9]{6}$/.test(text)){
+                setSignupFormError((form) => {
+                    return {
+                        ...form,
+                        [field]: 'OTP should be XXXXXX.'
+                    }
+                })
+            }
+            else{
+                setSignupFormError((form) => {
+                    return {
+                        ...form,
+                        [field]: ''
+                    }
+                })
+            }
+        }
     }
 
+    const checkValidityExceptOtp = () => {
+        let formIsValid = true
+        for(const key in signupFormError){
+            if(key !== 'otp'){
+                formIsValid = formIsValid && signupFormError[key] === '' && signupFormTouch[key] === true
+            }
+        }
+        return formIsValid
+    }
 
+    const requestOtp = async () => {
+        setIsLoading(true)
+        try{
+            await dispatch(authActions.requestOtp(signupForm['contact_num']))
+            .then((message) => {
+                if(message === "You may now input the OTP."){
+                    setShowOtp(true)
+                }
+                setIsLoading(false)
+            })
+        }
+        catch(err){
+            console.log(err.message);
+            if(err.message === 'You can request again after 5 minutes.'){
+                setShowOtp(true)
+            }
+            else{
+                Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
+            }
+            setIsLoading(false)
+        }
+    }
+
+    const signupHandler = () => {
+        if(!showOtp){
+            requestOtp()
+        }
+        else{
+            setVisible(true);
+        }
+    }
+
+    const signupSubmit = async () => {
+        setIsLoading(true)
+        try{
+            await dispatch(authActions.signup(signupForm))
+            .then(() => {
+                setIsLoading(false)
+                props.navigation.navigate('Content')
+            })
+        }
+        catch(err){
+            Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
+            setIsLoading(false)
+        }
+    }
+
+    const goBackOrLoginHandler = () => {
+        if(showOtp){
+            setShowOtp(false)
+        }
+        else{
+            setIsSignup(false)
+        }
+    }
 
     return (
         <View style={styles.screen}>
            
+           <DataPrivacyModal
+                visible={visible}
+                closeModal={() => setVisible(false)}
+                onAgree={signupSubmit}
+            />
+
            {isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
-                    {showOtp && <Input 
-                        id='otp'
+                    {showOtp && <InputSample 
+                        field='otp'
                         label='OTP Number'
                         keyboardType='phone-pad'
-                        required
-                        maxLength={6}
-                        minLength={6}
                         autoCapitalize="none"
-                        errorText="Please enter a valid OTP."
+                        errorMessage={signupFormError['otp']}
                         onInputChange={signupInputChangeHandler}
-                        initialValue={signupFormState.inputValues['otp']}
-                        initiallyValid={signupFormState.inputValidities['otp']}
+                        value={signupForm['otp']}
+                        touch={signupFormTouch['otp']}
                     />}
                     
                     {!showOtp && 
@@ -316,22 +402,21 @@ const AuthScreenSample = props => {
                         
                     </View>}
 
-                    
-
-                    {/* <View style={styles.wideButtonContainer}>
+                    <View style={styles.wideButtonContainer}>
                         {isLoading ? 
                         <ActivityIndicator size='small' color={Colors.orange}/>
                         :
                         <Button 
                             title="SIGNUP"
-                            color={Colors.maroon} onPress={signupHandler} 
-                            disabled={showOtp? !signupFormState.formIsValid : !checkValidityExceptOtp()}
+                            color={Colors.maroon} 
+                            onPress={signupHandler} 
+                            disabled={!checkValidityExceptOtp()}
                         />
                         }
                     </View>
                     <View style={styles.wideButtonContainer}>
                         <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler} disabled={isLoading}/>
-                    </View> */}
+                    </View>
 
                 </ScrollView>
             </Card>}
