@@ -10,13 +10,14 @@ import { useDispatch } from "react-redux";
 import * as authActions from '../store/actions/auth'
 
 import DataPrivacyModal from '../components/DataPrivacyModal';
+import Modal from '../components/Modal';
 
 const AuthScreen = props => {  
     const dispatch = useDispatch()
     const [isSignup, setIsSignup] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
     const [showOtp, setShowOtp] = useState(false)
-    const [visible, setVisible] = useState(false); //modal
+    const [agreementModalVisible, setAgreementModalVisible] = useState(false); //modal
 
 
     // start of signup code
@@ -326,7 +327,7 @@ const AuthScreen = props => {
             requestOtp()
         }
         else{
-            setVisible(true);
+            setAgreementModalVisible(true);
         }
     }
 
@@ -405,7 +406,7 @@ const AuthScreen = props => {
         catch(err){
             Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
             setIsLoading(false)
-            setVisible(false);
+            setAgreementModalVisible(false);
         }
     }
 
@@ -424,11 +425,20 @@ const AuthScreen = props => {
     return (
         <View style={styles.screen}>
            
-           <DataPrivacyModal
+           {/* <DataPrivacyModal
                 visible={visible}
                 closeModal={() => setVisible(false)}
                 onAgree={signupSubmit}
-            />
+            /> */}
+           <Modal
+                header='Data Privacy Agreement'
+                visible={agreementModalVisible}
+                closeModal={() => setAgreementModalVisible(false)}
+                onAgree={signupSubmit}
+                agreeText='I Agree'
+            >
+                <Text style={styles.agreement}>{`UPTrace shall not disclose the personal information of users without their consent and shall only use this data for contact tracing. These are strictly implemented in compliance with the Philippine Data Privacy Act of 2012 to protect your right to data privacy. As provided by law, you may request to access, correct, erase, or block provided information in this form on reasonable grounds.\n\nBy clicking "I agree," you have carefully read, understood, and agreed to the said conditions, and you express your consent for UPTrace to process the personal data that you may submit without precluding your rights under the Data Privacy Act of 2012. As provided by law, you may request to access, correct, erase, or block provided information in this form on reasonable grounds.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur fringilla eget sapien vel porttitor. Phasellus interdum ex eget ultricies lobortis. Mauris mollis vehicula nisl id euismod. Proin sit amet venenatis lorem, a eleifend tortor. Proin semper tincidunt lacus eget ornare. Morbi porttitor risus ac odio placerat malesuada. In sed vulputate velit. Sed in mauris tincidunt, maximus libero a, faucibus ante. Curabitur quis fermentum mi.`}</Text>
+            </Modal>
 
            {isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
@@ -760,6 +770,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'white',
         fontFamily: 'roboto-regular'
+    },
+    agreement: {
+        fontFamily: 'roboto-regular',
+        fontSize: 16,
+        marginBottom: 10
     },
 })
 
