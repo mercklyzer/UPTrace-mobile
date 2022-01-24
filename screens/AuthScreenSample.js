@@ -6,8 +6,7 @@ import InputSample from "../components/InputSample";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment'
 import Colors from '../constants/Colors'
-import * as authActions from '../store/actions/auth'
-import { useDispatch, useSelector } from "react-redux";
+
 import DataPrivacyModal from '../components/DataPrivacyModal';
 
 
@@ -49,11 +48,53 @@ const AuthScreenSample = props => {
         otp: ''
     })
 
-    // this handles the dependency on setState
+    // for contact time
+    const [startShow, setStartShow] = useState(false);
+    const [endShow, setEndShow] = useState(false);
+
+    const showTimepicker = (field) => {
+        if(field === 'start_time'){
+            setStartShow(true)
+        }
+        else if(field === 'end_time'){
+            setEndShow(true)
+        }
+    };
+
+    const onTimeChange = (event, selectedTime, field) => {
+        if(field === 'start_time'){
+            setStartShow(Platform.OS === 'ios');
+        }
+        else if(field === 'end_time'){
+            setEndShow(Platform.OS === 'ios');
+        }
+
+        setSignupFormTouch(form => {
+            return {
+                ...form,
+                [field]: true
+            }
+        })
+
+        setSignupForm(form => {
+            return {
+                ...form,
+                [field]: moment(selectedTime).format("HH:mm")
+            }
+        })
+    };
+
+    // this handles the dependency on setState (password)
     useEffect(() => {
         formValidator(signupForm.password, 'password')
         formValidator(signupForm.confirm_password, 'confirm_password')
     }, [signupForm.password, signupForm.confirm_password])
+
+    // this handles the dependency on setState (time)
+    useEffect(() => {
+        formValidator(signupForm.start_time, 'start_time')
+        formValidator(signupForm.end_time, 'end_time')
+    }, [signupForm.start_time, signupForm.end_time])
 
     const signupInputChangeHandler = (text, field) => {
         text = textCleanHandler(text, field)
@@ -131,6 +172,26 @@ const AuthScreenSample = props => {
                 })
             }
         }
+        if(field === 'start_time' || field === 'end_time'){
+            if(signupForm['start_time'] >= signupForm['end_time'] && signupFormTouch['start_time'] && signupFormTouch['end_time']){
+                setSignupFormError((form) => {
+                    return {
+                        ...form,
+                        ['start_time']: 'Start time should be before the end time.',
+                        ['end_time']: 'End time should be after the start time.'
+                    }
+                })
+            }
+            else{
+                setSignupFormError((form) => {
+                    return {
+                        ...form,
+                        ['start_time']: '',
+                        ['end_time']: ''
+                    }
+                })
+            }
+        }
     }
 
 
@@ -189,7 +250,59 @@ const AuthScreenSample = props => {
                             value={signupForm['confirm_password']}
                             touch={signupFormTouch['confirm_password']}
                         />
+                        <View style={styles.startAndEndTimeContainer}>
+                            <Text style={styles.formControlHeader}>Preferred Contact Time:</Text>
+                            <View style={styles.formGroup}>
+                                <Text style={styles.formControlLabel}>Start Time:</Text>
+                                <View style={styles.timeInput}>
+                                    <Text style={styles.timeText}>{signupForm['start_time']? moment(signupForm['start_time'], 'HH:mm').format("hh:mm A"): ''}</Text>
+                                    <View style={styles.setButtonContainer}>
+                                        <Button onPress={() => showTimepicker('start_time')} title="Set" color={Colors.darkgreen}/>
+                                    </View>
+                                </View>
+                                {signupFormError['start_time'] !== '' && signupFormTouch['start_time'] && signupFormTouch['end_time'] && (<View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>{signupFormError['start_time']}</Text>
+                                </View>)}
+                            </View>
+                            
+                            {startShow && (
+                                <DateTimePicker
+                                testID="dateTimePickerStart"
+                                value={new Date(1)}
+                                mode="time"
+                                is24Hour={false}
+                                display="default"
+                                onChange={(event, selectedTime) => onTimeChange(event, selectedTime, 'start_time')}
+                                />
+                            )}
+
+                            <View style={styles.formGroup}>
+                                <Text style={styles.formControlLabel}>End Time:</Text>
+                                <View style={styles.timeInput}>
+                                    <Text style={styles.timeText}>{signupForm['end_time']? moment(signupForm['end_time'], 'HH:mm').format("hh:mm A"): ''}</Text>
+                                    <View style={styles.setButtonContainer}>
+                                        <Button onPress={() => showTimepicker('end_time')} title="Set" color={Colors.darkgreen}/>
+                                    </View>
+                                </View>
+                                {signupFormError['end_time'] !== '' && signupFormTouch['start_time'] && signupFormTouch['end_time'] && (<View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>{signupFormError['end_time']}</Text>
+                                </View>)}
+                            </View>
+                            
+                            {endShow && (
+                                <DateTimePicker
+                                testID="dateTimePickerEnd"
+                                value={new Date(1)}
+                                mode="time"
+                                is24Hour={false}
+                                display="default"
+                                onChange={(event, selectedTime) => onTimeChange(event, selectedTime, 'end_time')}
+                            />)}
+                        </View>
+                        
                     </View>}
+
+                    
 
                     {/* <View style={styles.wideButtonContainer}>
                         {isLoading ? 
