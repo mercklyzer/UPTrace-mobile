@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useReducer, useState } from "react";
-import { Button, StyleSheet, Text, View, ScrollView, Alert, ActivityIndicator, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Button, StyleSheet, Text, View, ScrollView, Alert, ActivityIndicator, Dimensions, ActionSheetIOS, Pressable, TouchableOpacity, Platform } from "react-native";
 import {Picker} from '@react-native-picker/picker'
 import Card from '../components/Card'
-import InputSample from "../components/InputSample";
+import Input from "../components/Input";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment'
 import Colors from '../constants/Colors'
@@ -11,7 +11,7 @@ import * as authActions from '../store/actions/auth'
 
 import DataPrivacyModal from '../components/DataPrivacyModal';
 
-const AuthScreenSample = props => {  
+const AuthScreen = props => {  
     const dispatch = useDispatch()
     const [isSignup, setIsSignup] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
@@ -25,8 +25,8 @@ const AuthScreenSample = props => {
         password: '',
         confirm_password: '',
         role: 'ordinary',
-        start_time: '',
-        end_time: '',
+        start_time: Platform.OS === 'android'? '':'00:00',
+        end_time: Platform.OS === 'android'? '':'00:00',
         way_of_interview: 'One at a time',
         otp: ''
     })
@@ -35,8 +35,8 @@ const AuthScreenSample = props => {
         contact_num: false,
         password: false,
         confirm_password: false,
-        start_time: false,
-        end_time: false,
+        start_time: Platform.OS === 'ios'? true: false,
+        end_time: Platform.OS === 'ios'? true: false,
         way_of_interview: true,
         otp: false
     })
@@ -52,8 +52,8 @@ const AuthScreenSample = props => {
     })
 
     // for contact time
-    const [startShow, setStartShow] = useState(false);
-    const [endShow, setEndShow] = useState(false);
+    const [startShow, setStartShow] = useState(Platform.OS === 'ios'? true : false);
+    const [endShow, setEndShow] = useState(Platform.OS === 'ios'? true : false);
 
     const showTimepicker = (field) => {
         if(field === 'start_time'){
@@ -67,9 +67,15 @@ const AuthScreenSample = props => {
     const onTimeChange = (event, selectedTime, field) => {
         if(field === 'start_time'){
             setStartShow(Platform.OS === 'ios');
+            if(Platform.OS === 'ios'){
+                setUnixStartTime(selectedTime)       
+            }
         }
         else if(field === 'end_time'){
             setEndShow(Platform.OS === 'ios');
+            if(Platform.OS === 'ios'){
+                setUnixEndTime(selectedTime)       
+            }
         }
 
         setSignupFormTouch(form => {
@@ -86,6 +92,33 @@ const AuthScreenSample = props => {
             }
         })
     };
+
+    // for ios
+    const initialTime = new Date()
+    initialTime.setHours(0)
+    initialTime.setMinutes(0)
+    const [unixStartTime, setUnixStartTime] = useState(initialTime)
+    const [unixEndTime, setUnixEndTime] = useState(initialTime)
+
+    const changeWayOfContactIOS = () => {
+        ActionSheetIOS.showActionSheetWithOptions(
+            {
+              options: ["Cancel", "One at a time", "All at once"],
+              cancelButtonIndex: 0,
+              userInterfaceStyle: 'dark'
+            },
+            buttonIndex => {
+              if (buttonIndex === 0) {
+                // cancel action
+              } else if (buttonIndex === 1) {
+                  console.log("one at a time");
+                signupInputChangeHandler('Once at a time', 'way_of_interview')
+              } else if (buttonIndex === 2) {
+                signupInputChangeHandler('All at once', 'way_of_interview')
+              }
+            }
+          );
+    }
 
     // this handles the dependency on setState (password)
     useEffect(() => {
@@ -255,10 +288,10 @@ const AuthScreenSample = props => {
         }
     }
 
-    const checkValidityExceptOtp = () => {
+    const checkSignupValidity = (restriction) => {
         let formIsValid = true
         for(const key in signupFormError){
-            if(key !== 'otp'){
+            if(key !== restriction){
                 formIsValid = formIsValid && signupFormError[key] === '' && signupFormTouch[key] === true
             }
         }
@@ -399,7 +432,7 @@ const AuthScreenSample = props => {
 
            {isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
-                    {showOtp && <InputSample 
+                    {showOtp && <Input 
                         field='otp'
                         label='OTP Number'
                         keyboardType='phone-pad'
@@ -412,7 +445,7 @@ const AuthScreenSample = props => {
                     
                     {!showOtp && 
                     <View>                  
-                        <InputSample 
+                        <Input 
                             field='contact_num'
                             label='Contact Number'
                             keyboardType='phone-pad'
@@ -423,7 +456,7 @@ const AuthScreenSample = props => {
                             value={signupForm['contact_num']}
                             touch={signupFormTouch['contact_num']}
                         />
-                        <InputSample 
+                        <Input 
                             field='password'
                             label='Password'
                             keyboardType='default'
@@ -434,7 +467,7 @@ const AuthScreenSample = props => {
                             value={signupForm['password']}
                             touch={signupFormTouch['password']}
                         />
-                        <InputSample 
+                        <Input 
                             field='confirm_password'
                             label='Confirm Password'
                             keyboardType='default'
@@ -449,12 +482,12 @@ const AuthScreenSample = props => {
                             <Text style={styles.formControlHeader}>Preferred Contact Time:</Text>
                             <View style={styles.formGroup}>
                                 <Text style={styles.formControlLabel}>Start Time:</Text>
-                                <View style={styles.timeInput}>
-                                    <Text style={styles.timeText}>{signupForm['start_time']? moment(signupForm['start_time'], 'HH:mm').format("hh:mm A"): ''}</Text>
+                                {Platform.OS === 'android' && <View style={styles.timeInput}>
+                                    <Text style={styles.text}>{signupForm['start_time']? moment(signupForm['start_time'], 'HH:mm').format("hh:mm A"): ''}</Text>
                                     <View style={styles.setButtonContainer}>
                                         <Button onPress={() => showTimepicker('start_time')} title="Set" color={Colors.darkgreen}/>
                                     </View>
-                                </View>
+                                </View>}
                                 {signupFormError['start_time'] !== '' && signupFormTouch['start_time'] && signupFormTouch['end_time'] && (<View style={styles.errorContainer}>
                                     <Text style={styles.errorText}>{signupFormError['start_time']}</Text>
                                 </View>)}
@@ -463,7 +496,7 @@ const AuthScreenSample = props => {
                             {startShow && (
                                 <DateTimePicker
                                 testID="dateTimePickerStart"
-                                value={new Date(1)}
+                                value={Platform.OS === 'android'? new Date(1) : unixStartTime}
                                 mode="time"
                                 is24Hour={false}
                                 display="default"
@@ -473,12 +506,12 @@ const AuthScreenSample = props => {
 
                             <View style={styles.formGroup}>
                                 <Text style={styles.formControlLabel}>End Time:</Text>
-                                <View style={styles.timeInput}>
-                                    <Text style={styles.timeText}>{signupForm['end_time']? moment(signupForm['end_time'], 'HH:mm').format("hh:mm A"): ''}</Text>
+                                {Platform.OS === 'android' && <View style={styles.timeInput}>
+                                    <Text style={styles.text}>{signupForm['end_time']? moment(signupForm['end_time'], 'HH:mm').format("hh:mm A"): ''}</Text>
                                     <View style={styles.setButtonContainer}>
                                         <Button onPress={() => showTimepicker('end_time')} title="Set" color={Colors.darkgreen}/>
                                     </View>
-                                </View>
+                                </View>}
                                 {signupFormError['end_time'] !== '' && signupFormTouch['start_time'] && signupFormTouch['end_time'] && (<View style={styles.errorContainer}>
                                     <Text style={styles.errorText}>{signupFormError['end_time']}</Text>
                                 </View>)}
@@ -487,7 +520,7 @@ const AuthScreenSample = props => {
                             {endShow && (
                                 <DateTimePicker
                                 testID="dateTimePickerEnd"
-                                value={new Date(1)}
+                                value={Platform.OS === 'android'? new Date(1) : unixEndTime}
                                 mode="time"
                                 is24Hour={false}
                                 display="default"
@@ -498,33 +531,59 @@ const AuthScreenSample = props => {
                         <View>                       
                             <View style={styles.formGroup}>
                                 <Text style={styles.formControlHeader}>Preferred Way of Contact:</Text>
-                                <Picker
+                                {Platform.OS === 'android' ? <Picker
                                     selectedValue={signupForm['way_of_interview']}
                                     style={{ height: 50, width: 200}}
                                     onValueChange={(itemValue, itemIndex) => signupInputChangeHandler(itemValue, 'way_of_interview')}
                                 >
                                     <Picker.Item label="One at a time" value="One at a time" />
                                     <Picker.Item label="All at once" value="All at once" />
-                                </Picker>
+                                </Picker> :
+                                <View style={styles.row}>
+                                    <Text style={styles.text}>{signupForm['way_of_interview']}</Text>
+                                    <TouchableOpacity style={styles.button} onPress={changeWayOfContactIOS}>
+                                        <Text style={styles.buttonText}>Change</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                }
                             </View>
                         </View>
                         
                     </View>}
 
-                    <View style={styles.wideButtonContainer}>
+                    <View style={{
+                        ...styles.wideButtonContainer,
+                        opacity: Platform.OS === 'ios' && (showOtp? !checkSignupValidity() : !checkSignupValidity('otp'))? 0.5 : 1
+                    }}>
                         {isLoading ? 
                         <ActivityIndicator size='small' color={Colors.orange}/>
                         :
-                        <Button 
+                        (Platform.OS === 'android'? <Button 
                             title="SIGNUP"
                             color={Colors.maroon} 
                             onPress={signupHandler} 
-                            disabled={!checkValidityExceptOtp()}
-                        />
+                            disabled={showOtp? !checkSignupValidity() : !checkSignupValidity('otp')}
+                        /> :
+                        <TouchableOpacity 
+                            style={{
+                                ...styles.wideButton, 
+                                backgroundColor: Colors.maroon, 
+                            }} 
+                            onPress={signupHandler}  
+                            disabled={!checkSignupValidity('otp')}>
+                            <Text style={styles.wideButtonText}>SIGNUP</Text>
+                        </TouchableOpacity>)
                         }
                     </View>
-                    <View style={styles.wideButtonContainer}>
-                        <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler} disabled={isLoading}/>
+                    <View style={{
+                        ...styles.wideButtonContainer,
+                        opacity: isLoading? 0.5 : 1
+                    }}>
+                        {Platform.OS === 'android'? <Button title={showOtp? 'Go Back' : 'Go to Login'} color={Colors.darkgreen} onPress={goBackOrLoginHandler} disabled={isLoading}/>
+                        : 
+                        <TouchableOpacity style={styles.wideButton} onPress={goBackOrLoginHandler} disabled={isLoading}>
+                            <Text style={styles.wideButtonText}>{showOtp? 'Go Back' : 'GO TO LOGIN'}</Text>
+                        </TouchableOpacity>}
                     </View>
 
                 </ScrollView>
@@ -534,7 +593,7 @@ const AuthScreenSample = props => {
                 <ScrollView>
 
                     <View>                  
-                        <InputSample 
+                        <Input 
                             field='contact_num'
                             label='Contact Number'
                             keyboardType='phone-pad'
@@ -545,7 +604,7 @@ const AuthScreenSample = props => {
                             value={loginForm['contact_num']}
                             touch={loginFormTouch['contact_num']}
                         />
-                        <InputSample 
+                        <Input 
                             field='password'
                             label='Password'
                             keyboardType='default'
@@ -562,11 +621,31 @@ const AuthScreenSample = props => {
                         {isLoading ? 
                             <ActivityIndicator size='small' color={Colors.orange}/>
                             :
-                            <Button title="LOGIN" color={Colors.maroon} onPress={loginHandler} disabled={!checkLoginValidity()}/>
+                            Platform.OS === 'android' ? <Button title="LOGIN" color={Colors.maroon} onPress={loginHandler} disabled={!checkLoginValidity()}/>
+                            :   <View style={
+                                {
+                                    ...styles.wideButtonContainer,
+                                    opacity: !checkLoginValidity()? 0.5 : 1
+                                }}>
+                                <Pressable style={{...styles.wideButton, backgroundColor: Colors.maroon}} onPress={loginHandler} disabled={!checkLoginValidity()}>
+                                    <Text style={styles.wideButtonText}>LOGIN</Text>
+                                </Pressable>
+                            </View>
+                            
                         }
                     </View>
-                    <View style={styles.wideButtonContainer}>
-                        <Button title="Go to Signup" color={Colors.darkgreen} onPress={() => setIsSignup(true)} disabled={isLoading}/>
+                    <View tyle={
+                        {
+                            ...styles.wideButtonContainer,
+                            opacity: isLoading? 0.5 : 1
+                        }}>
+                        {Platform.OS === 'android' ? <Button title="Go to Signup" color={Colors.darkgreen} onPress={() => setIsSignup(true)} disabled={isLoading}/>
+                        : <Pressable style={styles.wideButton} onPress={() => setIsSignup(true)} disabled={isLoading}>
+                            <Text style={{
+                                ...styles.wideButtonText,
+                                opacity: isLoading? 0.5 : 1
+                            }}>GO TO SIGNUP</Text>
+                        </Pressable>}
                     </View>
 
                 </ScrollView>
@@ -576,7 +655,7 @@ const AuthScreenSample = props => {
     )
 }
 
-AuthScreenSample.navigationOptions = navData => {
+AuthScreen.navigationOptions = navData => {
     return {
         headerTitle: 'Authentication'
     }
@@ -640,7 +719,48 @@ const styles = StyleSheet.create({
         // fontFamily: 'open-sans',
         color: 'red',
         fontSize: 13
-    }
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    text: {
+        fontFamily: 'roboto-italic',
+        fontSize: Dimensions.get('window').width > 600? 22: 16,
+    },
+    button: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 6,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        elevation: 3,
+        backgroundColor: Colors.darkgreen,
+        marginTop: 4,
+        marginBottom: 12
+    },
+    buttonText:{
+        fontSize: 16,
+        lineHeight: 21,
+        letterSpacing: 0.25,
+        color: 'white',
+        fontFamily: 'roboto-regular'
+    },
+    wideButton: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 4,
+        elevation: 3,
+        backgroundColor: Colors.darkgreen,
+    },
+    wideButtonText: {
+        fontSize: 16,
+        color: 'white',
+        fontFamily: 'roboto-regular'
+    },
 })
 
-export default AuthScreenSample
+export default AuthScreen

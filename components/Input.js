@@ -1,83 +1,41 @@
-import React, { useEffect, useReducer } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, TextInput, StyleSheet, Dimensions } from 'react-native'
-import { borderColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes'
 import Colors from '../constants/Colors'
 
-const INPUT_CHANGE = 'INPUT_CHANGE'
-const INPUT_BLUR = 'INPUT_BLUR'
-
-const inputReducer = (state, action) => {
-    switch(action.type){
-        case INPUT_CHANGE:
-            return {
-                ...state,
-                value: action.value,
-                isValid: action.isValid
-            }
-        case INPUT_BLUR:
-            return {
-                ...state,
-                touched: true
-            }
-        default:
-            return state
-    }
-}
 
 const Input = props => {
-    const [inputState, dispatch] = useReducer(inputReducer, {
-        value: props.initialValue? props.initialValue: '',
-        isValid: props.initiallyValid,
-        touched: props.initialValue ? true : false
-    })
-
-    const {onInputChange, id} = props
+    const [value, setValue] = useState(props.value)
+    const [touch, setTouch] = useState(props.touch)
+    const [errorMessage, setErrorMessage] = useState(props.errorMessage)
 
     useEffect(() => {
-        if(inputState.touched){
-            onInputChange(id, inputState.value, inputState.isValid)
-        }
-    }, [inputState, onInputChange, id])
+        setValue(props.value)
+    }, [props.value])
 
-    const textChangeHandler = text => {
-        let isValid = true;
-        if (props.required && text.trim().length === 0) {
-        isValid = false;
-        }
+    useEffect(() => {
+        setTouch(props.touch)
+    }, [props.touch])
 
-        if (props.minLength != null && text.length < props.minLength) {
-        isValid = false;
-        }
-
-        if (props.maxLength != null && text.length > props.maxLength) {
-        isValid = false;
-        }
-        dispatch({type: INPUT_CHANGE, value: text, isValid: isValid})
-        dispatch({type: INPUT_BLUR})
-    }
+    useEffect(() => {
+        setErrorMessage(props.errorMessage)
+    }, [props.errorMessage])
 
     return (
         <View style={styles.formControl}>
             <Text style={styles.label}>{props.label}</Text>
             <TextInput 
                 {...props}
-            // see docs
                 style={styles.input} 
-                value={inputState.value} 
-                onChangeText={textChangeHandler}
+                value={value} 
+                onChangeText={(text) => props.onInputChange(text, props.field)}
             />
 
-            {!inputState.isValid && inputState.touched && (
+            {errorMessage !=='' && touch && (
                 <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{props.errorText}</Text>
+                    <Text style={styles.errorText}>{errorMessage}</Text>
                 </View>
             )}
 
-            {props.forceErrorText !== '' && inputState.touched && (
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{props.forceErrorText}</Text>
-                </View>
-            )}
         </View>
     )
 }

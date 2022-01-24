@@ -14,7 +14,7 @@ import {Ionicons, MaterialCommunityIcons, MaterialIcons} from '@expo/vector-icon
 import Colors from '../constants/Colors'
 import { Text } from 'react-native'
 import StartupScreen from '../screens/StartupScreen'
-import AuthScreenSample from '../screens/AuthScreenSample'
+import AuthScreenSample from '../screens/AuthScreen'
 
 
 const defaultNavOptions = {
