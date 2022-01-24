@@ -39,7 +39,7 @@ const DataPrivacyModal = props => {
                             {props.children}
                             <View style={styles.submitContainer}>
                                 <CustomButton
-                                    heading={"I agree"}
+                                    heading={props.agreeText}
                                     headingFontSize={16}
                                     buttonColor={Colors.maroon}
                                     isDisabled={false}

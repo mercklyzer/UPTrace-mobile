@@ -9,8 +9,8 @@ import Colors from '../constants/Colors'
 import { useDispatch } from "react-redux";
 import * as authActions from '../store/actions/auth'
 
-import DataPrivacyModal from '../components/DataPrivacyModal';
 import Modal from '../components/Modal';
+import { Ionicons } from '@expo/vector-icons';
 
 const AuthScreen = props => {  
     const dispatch = useDispatch()
@@ -18,6 +18,7 @@ const AuthScreen = props => {
     const [isLoading, setIsLoading] = useState(false)
     const [showOtp, setShowOtp] = useState(false)
     const [agreementModalVisible, setAgreementModalVisible] = useState(false); //modal
+    const [contactModalVisible, setContactModalVisible] = useState(false); //modal
 
 
     // start of signup code
@@ -425,11 +426,6 @@ const AuthScreen = props => {
     return (
         <View style={styles.screen}>
            
-           {/* <DataPrivacyModal
-                visible={visible}
-                closeModal={() => setVisible(false)}
-                onAgree={signupSubmit}
-            /> */}
            <Modal
                 header='Data Privacy Agreement'
                 visible={agreementModalVisible}
@@ -438,6 +434,16 @@ const AuthScreen = props => {
                 agreeText='I Agree'
             >
                 <Text style={styles.agreement}>{`UPTrace shall not disclose the personal information of users without their consent and shall only use this data for contact tracing. These are strictly implemented in compliance with the Philippine Data Privacy Act of 2012 to protect your right to data privacy. As provided by law, you may request to access, correct, erase, or block provided information in this form on reasonable grounds.\n\nBy clicking "I agree," you have carefully read, understood, and agreed to the said conditions, and you express your consent for UPTrace to process the personal data that you may submit without precluding your rights under the Data Privacy Act of 2012. As provided by law, you may request to access, correct, erase, or block provided information in this form on reasonable grounds.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur fringilla eget sapien vel porttitor. Phasellus interdum ex eget ultricies lobortis. Mauris mollis vehicula nisl id euismod. Proin sit amet venenatis lorem, a eleifend tortor. Proin semper tincidunt lacus eget ornare. Morbi porttitor risus ac odio placerat malesuada. In sed vulputate velit. Sed in mauris tincidunt, maximus libero a, faucibus ante. Curabitur quis fermentum mi.`}</Text>
+            </Modal>
+
+           <Modal
+                header='Preferred Contact Time'
+                visible={contactModalVisible}
+                closeModal={() => setContactModalVisible(false)}
+                onAgree={() => {setContactModalVisible(prev => !prev)}}
+                agreeText='Okay'
+            >
+                <Text style={styles.agreement}>{`Preferred Contact Time is composed of 2 fields: Start Time and End Time. This asks which time of the day do you usually prefer to be contacted by the UPHS Contact Tracers only when necessary.`}</Text>
             </Modal>
 
            {isSignup && <Card style={styles.authContainer}>
@@ -489,7 +495,15 @@ const AuthScreen = props => {
                             touch={signupFormTouch['confirm_password']}
                         />
                         <View style={styles.startAndEndTimeContainer}>
-                            <Text style={styles.formControlHeader}>Preferred Contact Time:</Text>
+                            <View style={styles.spaceBetween}>
+                                <Text style={styles.formControlHeader}>Preferred Contact Time:</Text>
+                                <Ionicons
+                                    name='help-circle'
+                                    size={27}
+                                    color="black"
+                                    onPress={() => setContactModalVisible((prev) => !prev)}
+                                />
+                            </View>
                             <View style={styles.formGroup}>
                                 <Text style={styles.formControlLabel}>Start Time:</Text>
                                 {Platform.OS === 'android' && <View style={styles.timeInput}>
@@ -709,8 +723,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        // borderColor: 'red',
-        // borderWidth: 2
+    },
+    spaceBetween: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
     timeText: {
         fontFamily: 'roboto-italic',
