@@ -18,6 +18,8 @@ const AuthScreenSample = props => {
     const [showOtp, setShowOtp] = useState(false)
     const [visible, setVisible] = useState(false); //modal
 
+
+    // start of signup code
     const [signupForm, setSignupForm] = useState({
         contact_num: '',
         password: '',
@@ -87,14 +89,14 @@ const AuthScreenSample = props => {
 
     // this handles the dependency on setState (password)
     useEffect(() => {
-        formValidator(signupForm.password, 'password')
-        formValidator(signupForm.confirm_password, 'confirm_password')
+        formValidator(signupForm.password, 'password', 'signup')
+        formValidator(signupForm.confirm_password, 'confirm_password', 'signup')
     }, [signupForm.password, signupForm.confirm_password])
 
     // this handles the dependency on setState (time)
     useEffect(() => {
-        formValidator(signupForm.start_time, 'start_time')
-        formValidator(signupForm.end_time, 'end_time')
+        formValidator(signupForm.start_time, 'start_time', 'signup')
+        formValidator(signupForm.end_time, 'end_time', 'signup')
     }, [signupForm.start_time, signupForm.end_time])
 
     const signupInputChangeHandler = (text, field) => {
@@ -116,7 +118,7 @@ const AuthScreenSample = props => {
 
         // password and confirm password are handled using useEffect since they have dependency on setState
         if(field !== 'password' && field != 'confirm_password'){
-            formValidator(text, field)
+            formValidator(text, field, 'signup')
         }
     }
 
@@ -127,88 +129,128 @@ const AuthScreenSample = props => {
         return text
     }
 
-    const formValidator = (text, field) => {
-        if(field === 'contact_num'){
-            if(!/^(09)\d{9}$/.test(text)){
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        [field]: 'Contact Number should be 09XXXXXXXXX.'
-                    }
-                })
+    const formValidator = (text, field, form) => {
+        if(form === 'signup'){
+            if(field === 'contact_num'){
+                if(!/^(09)\d{9}$/.test(text)){
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: 'Contact Number should be 09XXXXXXXXX.'
+                        }
+                    })
+                }
+                else{
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: ''
+                        }
+                    })
+                }
             }
-            else{
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        [field]: ''
-                    }
-                })
+            if(field === 'password' || field === 'confirm_password'){
+                if(!/([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,16})/g.test(text)){
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: `Password should be 8 to 16 alphanumeric or special characters.`
+                        }
+                    })
+                }
+                else if(signupForm['password'] !== signupForm['confirm_password']){
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            ['password']: 'Passwords do not match.',
+                            ['confirm_password']: 'Passwords do not match.'
+                        }
+                    })
+                }
+                else{
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: ''
+                        }
+                    })
+                }
+            }
+            if(field === 'start_time' || field === 'end_time'){
+                if(signupForm['start_time'] >= signupForm['end_time'] && signupFormTouch['start_time'] && signupFormTouch['end_time']){
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            ['start_time']: 'Start time should be before the end time.',
+                            ['end_time']: 'End time should be after the start time.'
+                        }
+                    })
+                }
+                else{
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            ['start_time']: '',
+                            ['end_time']: ''
+                        }
+                    })
+                }
+            }
+            if(field === 'otp'){
+                if(!/^[0-9]{6}$/.test(text)){
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: 'OTP should be XXXXXX.'
+                        }
+                    })
+                }
+                else{
+                    setSignupFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: ''
+                        }
+                    })
+                }
             }
         }
-        if(field === 'password' || field === 'confirm_password'){
-            if(!/([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,16})/g.test(text)){
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        [field]: `Password should be 8 to 16 alphanumeric or special characters.`
-                    }
-                })
+        else if(form === 'login'){
+            if(field === 'contact_num'){
+                if(!/^(09)\d{9}$/.test(text)){
+                    setLoginFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: 'Contact Number should be 09XXXXXXXXX.'
+                        }
+                    })
+                }
+                else{
+                    setLoginFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: ''
+                        }
+                    })
+                }
             }
-            else if(signupForm['password'] !== signupForm['confirm_password']){
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        ['password']: 'Passwords do not match.',
-                        ['confirm_password']: 'Passwords do not match.'
-                    }
-                })
-            }
-            else{
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        [field]: ''
-                    }
-                })
-            }
-        }
-        if(field === 'start_time' || field === 'end_time'){
-            if(signupForm['start_time'] >= signupForm['end_time'] && signupFormTouch['start_time'] && signupFormTouch['end_time']){
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        ['start_time']: 'Start time should be before the end time.',
-                        ['end_time']: 'End time should be after the start time.'
-                    }
-                })
-            }
-            else{
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        ['start_time']: '',
-                        ['end_time']: ''
-                    }
-                })
-            }
-        }
-        if(field === 'otp'){
-            if(!/^[0-9]{6}$/.test(text)){
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        [field]: 'OTP should be XXXXXX.'
-                    }
-                })
-            }
-            else{
-                setSignupFormError((form) => {
-                    return {
-                        ...form,
-                        [field]: ''
-                    }
-                })
+            if(field === 'password'){
+                if(!/([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,16})/g.test(text)){
+                    setLoginFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: `Password should be 8 to 16 alphanumeric or special characters.`
+                        }
+                    })
+                }
+                else{
+                    setLoginFormError((form) => {
+                        return {
+                            ...form,
+                            [field]: ''
+                        }
+                    })
+                }
             }
         }
     }
@@ -278,6 +320,73 @@ const AuthScreenSample = props => {
             setIsSignup(false)
         }
     }
+
+    // end of signup code
+
+    //start of login code
+    const [loginForm, setLoginForm] = useState({
+            contact_num: '',
+            password: ''
+    })
+
+    const [loginFormTouch, setLoginFormTouch] = useState({
+        contact_num: false,
+        password: false,
+    })
+
+    const [loginFormError, setLoginFormError] = useState({
+        contact_num: '',
+        password: '',
+    })
+
+    const loginInputChangeHandler = (text, field) => {
+        text = textCleanHandler(text, field)
+        
+
+        setLoginFormTouch(form => {
+            return {
+                ...form,
+                [field]: true
+            }
+        })
+
+        setLoginForm(form => {
+            return {
+                ...form,
+                [field]: text
+            }
+        })
+
+        formValidator(text, field, 'login')
+    }
+
+    const loginHandler = async () => {
+        setIsLoading(true)
+        try {
+            await dispatch(authActions.login(loginForm.contact_num, loginForm.password))
+            .then(() => {
+                setIsLoading(false)
+                props.navigation.navigate('Content')
+            })
+        }
+        catch(err){
+            Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
+            setIsLoading(false)
+            setVisible(false);
+        }
+    }
+
+    const checkLoginValidity = () => {
+        let formIsValid = true
+        for(const key in loginFormError){
+            if(key !== 'otp'){
+                formIsValid = formIsValid && loginFormError[key] === '' && loginFormTouch[key] === true
+            }
+        }
+        return formIsValid
+    }
+
+
 
     return (
         <View style={styles.screen}>
@@ -420,6 +529,49 @@ const AuthScreenSample = props => {
 
                 </ScrollView>
             </Card>}
+
+            {!isSignup && <Card style={styles.authContainer}>
+                <ScrollView>
+
+                    <View>                  
+                        <InputSample 
+                            field='contact_num'
+                            label='Contact Number'
+                            keyboardType='phone-pad'
+                            required
+                            autoCapitalize="none"
+                            errorMessage={loginFormError['contact_num']}
+                            onInputChange={loginInputChangeHandler}
+                            value={loginForm['contact_num']}
+                            touch={loginFormTouch['contact_num']}
+                        />
+                        <InputSample 
+                            field='password'
+                            label='Password'
+                            keyboardType='default'
+                            secureTextEntry={true}
+                            required
+                            errorMessage={loginFormError['password']}
+                            onInputChange={loginInputChangeHandler}
+                            value={loginForm['password']}
+                            touch={loginFormTouch['password']}
+                        />
+                    </View>
+
+                    <View style={styles.wideButtonContainer}>
+                        {isLoading ? 
+                            <ActivityIndicator size='small' color={Colors.orange}/>
+                            :
+                            <Button title="LOGIN" color={Colors.maroon} onPress={loginHandler} disabled={!checkLoginValidity()}/>
+                        }
+                    </View>
+                    <View style={styles.wideButtonContainer}>
+                        <Button title="Go to Signup" color={Colors.darkgreen} onPress={() => setIsSignup(true)} disabled={isLoading}/>
+                    </View>
+
+                </ScrollView>
+            </Card>}
+
         </View>
     )
 }
