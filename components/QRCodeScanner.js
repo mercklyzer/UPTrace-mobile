@@ -88,7 +88,7 @@ const QRCodeScanner = props => {
         setScanned(true);
         setIsWaitingResponse(true);
         try {
-            await dispatch(scannerActions.addLog(userData, token, moment().unix(), data))
+            await dispatch(scannerActions.addLog(userData, token, data))
             .then((message) => {
                 console.log("room_id:", data);
                 Alert.alert('Success', "Successfully scanned QR code!", [{ text: 'Okay', onPress: props.switchTab }]);

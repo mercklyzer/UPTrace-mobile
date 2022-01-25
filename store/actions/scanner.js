@@ -8,7 +8,7 @@ export const ADD_LOG = 'ADD_LOG';
 
 
 
-export const addLog = (userData, token, scan_date, room_id) => {
+export const addLog = (userData, token, room_id) => {
     return async dispatch => {
         const response = await fetch(
             `${uri}/logs`,
@@ -19,7 +19,6 @@ export const addLog = (userData, token, scan_date, room_id) => {
                     'Authorization': token
                 },
                 body: JSON.stringify({
-                    scan_date: scan_date,
                     room_id: room_id,
                     user: userData
                 })
