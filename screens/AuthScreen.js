@@ -17,6 +17,8 @@ const AuthScreen = props => {
     const [isSignup, setIsSignup] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
     const [showOtp, setShowOtp] = useState(false)
+    const [otpExpiresIn, setOtpExpiresIn] = useState(0)
+    const [otpTimeLeft, setOtpTimeLeft] = useState(-1)
     const [agreementModalVisible, setAgreementModalVisible] = useState(false); //modal
     const [contactModalVisible, setContactModalVisible] = useState(false); //modal
 
@@ -304,24 +306,48 @@ const AuthScreen = props => {
         setIsLoading(true)
         try{
             await dispatch(authActions.requestOtp(signupForm['contact_num']))
-            .then((message) => {
-                if(message === "You may now input the OTP."){
+            .then((response) => {
+                if(response.message === "You may now input the OTP."){
                     setShowOtp(true)
+                    setOtpExpiresIn(response.expiresIn)
                 }
                 setIsLoading(false)
             })
         }
         catch(err){
             console.log(err.message);
-            if(err.message === 'You can request again after 5 minutes.'){
+            if(err.message.message === 'You can request again after 5 minutes.'){
                 setShowOtp(true)
+                console.log(err.message.expiresIn);
+                setOtpExpiresIn(err.message.expiresIn)
             }
             else{
-                Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
+                Alert.alert("Error Occurred!", err.message.message, [{text: 'Okay!'}])
             }
             setIsLoading(false)
         }
     }
+
+    useEffect(() => {
+        console.log("called");
+        if(otpExpiresIn !== 0) {
+            let countdownInterval = setInterval(() => {
+                let timeNow = moment().unix()
+                console.log(otpExpiresIn - timeNow);
+                setOtpTimeLeft(otpExpiresIn - timeNow)
+                if(otpExpiresIn - timeNow <= 0){
+                    clearInterval(countdownInterval)
+                    return
+                }
+                
+                console.log("counting down");
+            }, 1000)
+    
+            return (() => {
+                clearInterval(countdownInterval)
+            })
+        }
+    }, [otpExpiresIn])
 
     const signupHandler = () => {
         if(!showOtp){
@@ -448,7 +474,8 @@ const AuthScreen = props => {
 
            {isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
-                    {showOtp && <Input 
+                    {showOtp && <>
+                    <Input 
                         field='otp'
                         label='OTP Number'
                         keyboardType='phone-pad'
@@ -457,7 +484,12 @@ const AuthScreen = props => {
                         onInputChange={signupInputChangeHandler}
                         value={signupForm['otp']}
                         touch={signupFormTouch['otp']}
-                    />}
+                        />
+
+                    {otpTimeLeft > 0  && <Text>{`Your OTP expires in ${otpTimeLeft}s.`}</Text>}
+                    {otpTimeLeft === 0 && <Text style={styles.resendOtp} onPress={requestOtp}>Resend OTP</Text>}
+                    </>
+                        }
                     
                     {!showOtp && 
                     <View>                  
@@ -793,6 +825,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 10
     },
+    resendOtp:{
+        fontFamily: 'roboto-regular',
+        color: '#3b9aff',
+        textAlign: 'right'
+    }
 })
 
 export default AuthScreen

@@ -32,13 +32,13 @@ export const requestOtp = (contactNum) => {
 
         if(!response.ok){
             const errorResData = await response.json()
-            const errorMessage = errorResData.error.message
-
-            throw new Error(errorMessage)
+            // const errorMessage = errorResData.error.message
+            console.log(errorResData.error);
+            throw errorResData.error
         }
 
         const resData = await response.json()
-        return resData.message
+        return resData
     }
 }
 
