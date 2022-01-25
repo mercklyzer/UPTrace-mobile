@@ -33,6 +33,7 @@ export const addLog = (userData, token, room_id) => {
         }
 
         const resData = await response.json();
+        return resData
         // console.log("resData from scanner:", resData);
     };
 };

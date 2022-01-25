@@ -5,7 +5,7 @@ import {createDrawerNavigator, DrawerNavigatorItems} from 'react-navigation-draw
 import {createBottomTabNavigator} from 'react-navigation-tabs'
 import {createMaterialBottomTabNavigator} from 'react-navigation-material-bottom-tabs'
 
-import AuthScreen from '../screens/AuthScreen'
+import AuthScreen from '../screens/AuthScreen.js'
 import DiscloseScreen from '../screens/DiscloseScreen'
 import ScanScreen from '../screens/ScanScreen'
 import SummaryScreen from '../screens/SummaryScreen'
@@ -14,7 +14,6 @@ import {Ionicons, MaterialCommunityIcons, MaterialIcons} from '@expo/vector-icon
 import Colors from '../constants/Colors'
 import { Text } from 'react-native'
 import StartupScreen from '../screens/StartupScreen'
-import AuthScreenSample from '../screens/AuthScreen'
 
 
 const defaultNavOptions = {
@@ -31,8 +30,7 @@ const defaultNavOptions = {
 }
 
 const AuthNavigator = createStackNavigator({
-    // Auth: AuthScreen
-    Auth: AuthScreenSample
+    Auth: AuthScreen
 }, {
     defaultNavigationOptions: defaultNavOptions
 })

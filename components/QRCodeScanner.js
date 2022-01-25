@@ -11,6 +11,9 @@ import Colors from '../constants/Colors';
 import * as scannerActions from '../store/actions/scanner';
 
 const QRCodeScanner = props => {
+    const [scannedBuilding, setScannedBuilding] = useState('')
+    const [scannedRoom, setScannedRoom] = useState('')
+
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
     const [isWaitingResponse, setIsWaitingResponse] = useState(false);
@@ -83,15 +86,26 @@ const QRCodeScanner = props => {
         }
     };
 
+    useEffect(() => {
+        if(scannedBuilding !== '' && scannedRoom !== ''){
+            Alert.alert('Success', `Successfully scanned ${scannedBuilding} - ${scannedRoom}`, [{ text: 'Okay', onPress: props.switchTab }]);
+        }
+    }, [scannedBuilding, scannedRoom])
+
     const scanQRHandler = async ({ type, data }) => {
         // If the QR code scanned is valid, data === room_id
         setScanned(true);
         setIsWaitingResponse(true);
         try {
             await dispatch(scannerActions.addLog(userData, token, data))
-            .then((message) => {
+            .then((response) => {
+                console.log("scanned: ", response);
+
+                setScannedBuilding(response.building_name)
+                setScannedRoom(response.room_name)
+
                 console.log("room_id:", data);
-                Alert.alert('Success', "Successfully scanned QR code!", [{ text: 'Okay', onPress: props.switchTab }]);
+                // Alert.alert('Success', `Successfully scanned ${scannedBuilding} - ${scannedRoom}`, [{ text: 'Okay', onPress: props.switchTab }]);
             })
         } catch(err) {
             console.log("error:", err);
