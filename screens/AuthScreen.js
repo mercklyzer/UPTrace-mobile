@@ -191,7 +191,7 @@ const AuthScreen = props => {
                 }
             }
             if(field === 'password' || field === 'confirm_password'){
-                if(!/([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})/g.test(text)){
+                if(!/^([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})$/.test(text)){
                     setSignupFormError((form) => {
                         return {
                             ...form,
@@ -276,7 +276,7 @@ const AuthScreen = props => {
                 }
             }
             if(field === 'password'){
-                if(!/([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})/g.test(text)){
+                if(!/^([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})$/.test(text)){
                     setLoginFormError((form) => {
                         return {
                             ...form,
