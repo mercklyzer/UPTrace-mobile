@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, View, ScrollView, Alert, ActivityIndicator, Dimensions, ActionSheetIOS, Pressable, TouchableOpacity, Platform } from "react-native";
+import { Button, StyleSheet, Text, View, ScrollView, Alert, ActivityIndicator, Dimensions, ActionSheetIOS, Pressable, TouchableOpacity, Platform, Image, Linking } from "react-native";
 import {Picker} from '@react-native-picker/picker'
 import Card from '../components/Card'
 import Input from "../components/Input";
@@ -8,6 +8,9 @@ import moment from 'moment'
 import Colors from '../constants/Colors'
 import { useDispatch } from "react-redux";
 import * as authActions from '../store/actions/auth'
+import disc from '@jsamr/counter-style/presets/disc';
+import decimal from '@jsamr/counter-style/presets/decimal';
+import MarkedList from '@jsamr/react-native-li';
 
 import Modal from '../components/Modal';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +24,8 @@ const AuthScreen = props => {
     const [otpTimeLeft, setOtpTimeLeft] = useState(-1)
     const [agreementModalVisible, setAgreementModalVisible] = useState(false); //modal
     const [contactModalVisible, setContactModalVisible] = useState(false); //modal
-
+    const [interviewModalVisible, setInterviewModalVisible] = useState(false); //modal
+    const Strong = (props) => <Text style={{fontWeight: 'bold'}}>{props.children}</Text>;
 
     // start of signup code
     const [signupForm, setSignupForm] = useState({
@@ -457,9 +461,38 @@ const AuthScreen = props => {
                 visible={agreementModalVisible}
                 closeModal={() => setAgreementModalVisible(false)}
                 onAgree={signupSubmit}
-                agreeText='I Agree'
+                agreeText='I agree'
             >
-                <Text style={styles.agreement}>{`UPTrace shall not disclose the personal information of users without their consent and shall only use this data for contact tracing. These are strictly implemented in compliance with the Philippine Data Privacy Act of 2012 to protect your right to data privacy. As provided by law, you may request to access, correct, erase, or block provided information in this form on reasonable grounds.\n\nBy clicking "I agree," you have carefully read, understood, and agreed to the said conditions, and you express your consent for UPTrace to process the personal data that you may submit without precluding your rights under the Data Privacy Act of 2012. As provided by law, you may request to access, correct, erase, or block provided information in this form on reasonable grounds.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur fringilla eget sapien vel porttitor. Phasellus interdum ex eget ultricies lobortis. Mauris mollis vehicula nisl id euismod. Proin sit amet venenatis lorem, a eleifend tortor. Proin semper tincidunt lacus eget ornare. Morbi porttitor risus ac odio placerat malesuada. In sed vulputate velit. Sed in mauris tincidunt, maximus libero a, faucibus ante. Curabitur quis fermentum mi.`}</Text>
+                <Text style={styles.agreement}>
+                    UPTrace is a contact tracing application for a thesis made in partial fulfillment of CS 198/199 in the University of the Philippines Diliman (UPD). UPTrace shall not disclose the personal information of users without their consent and shall only use this data for the purposes of the thesis. These are strictly implemented in compliance with the Philippine <Text style={styles.link} onPress={() => Linking.openURL('https://www.officialgazette.gov.ph/2012/08/15/republic-act-no-10173/')}>Data Privacy Act of 2012</Text> to protect your right to data privacy.{'\n\n'}
+                    <Strong>What information we collect and why we collect it</Strong>{'\n'}
+                    <Text>UPTrace collects the following personal information upon registration, with the corresponding purpose:</Text>                    
+                </Text>
+                <View style={{ flexGrow: 1 }}>
+                    <MarkedList counterRenderer={disc}>
+                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Phone number</Strong> - to prevent fraud through a one-time PIN sent through SMS, and so that a user can be contacted if needed for contact tracing</Text>
+                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Password (encrypted)</Strong> - to secure your account</Text>
+                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Email address (only for Health Liaison Officers [HeLOs] and UP Health Service [UPHS] Contact Tracers)</Strong> - to identify a HeLO or a UPHS Contact Tracer and give them additional privileges in the application</Text>
+                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Preferred contact time</Strong> - to inform UPHS Contact Tracers of the start time and end time that you prefer to be contacted for monitoring and contact tracing </Text>
+                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Preferred way of interview</Strong> - to inform UPHS Contact Tracers of the way you prefer to be asked questions or to be interviewed for monitoring and contact tracing </Text>
+                    </MarkedList>
+                </View>
+                <Text style={styles.agreement}>
+                    Information about QR code scans are also collected, and this includes the user who scanned, the building and room visited, and the date and time of visit.{'\n\n'}
+                    <Strong>How we collect, use, share, and retain your data</Strong>                 
+                </Text>
+                <View style={{ flexGrow: 1 }}>
+                    <MarkedList counterRenderer={decimal}>
+                        <Text style={{ flexShrink: 1 }, styles.agreement}>When signing up in UPTrace, we collect information enumerated in the “What information we collect” section.</Text>
+                        <Text style={{ flexShrink: 1 }, styles.agreement}>After successfully signing up, you may now scan QR codes in every entrance and exit points of establishments, as well as in every room you enter there. We save your scan logs in a server and these may be used for contact tracing purposes if necessary. These data are used to identify possible close contacts and to identify establishments that require thorough disinfection.</Text>
+                        <Text style={{ flexShrink: 1 }, styles.agreement}>If you suspect yourself to be positive of COVID-19 or if you tested positive, you may report it in the app and you will be prompted to indicate whether you have symptoms or not. If you do have symptoms, you will also be asked when your symptoms started. These information will then be disclosed to UPHS contact tracers so that they may assist you and perform contact tracing.</Text>
+                    </MarkedList>
+                </View>
+                <Text style={styles.agreement}>
+                    Your data would only be retained and used for the purpose of testing the contact tracing app. It can only be accessed by the developers of UPTrace and by UPHS Contact Tracers. Technical measures are implemented to secure your data.{'\n\n'}
+                    By clicking "I agree," you have carefully read, understood, and agreed to the said conditions, and you express your consent for UPTrace to process the personal data that you may submit without precluding your rights under the Data Privacy Act of 2012. As provided by law, you may request to access, correct, erase, or block provided information in this form on reasonable grounds.{'\n\n'}
+                    For inquiries, suggestions, or any other concerns regarding our privacy practices, please contact us at lbbautista6@up.edu.ph and cyceloso1@up.edu.ph. Thank you!
+                </Text>
             </Modal>
 
            <Modal
@@ -470,6 +503,20 @@ const AuthScreen = props => {
                 agreeText='Okay'
             >
                 <Text style={styles.agreement}>{`Preferred Contact Time is composed of 2 fields: Start Time and End Time. This asks which time of the day do you usually prefer to be contacted by the UPHS Contact Tracers only when necessary.`}</Text>
+            </Modal>
+
+            <Modal
+                header='Preferred Way of Interview'
+                visible={interviewModalVisible}
+                closeModal={() => setInterviewModalVisible(false)}
+                onAgree={() => {setInterviewModalVisible(prev => !prev)}}
+                agreeText='Okay'
+            >
+                <Text style={styles.agreement}>{`Preferred Way of Interview asks in which way do you prefer to be asked questions by a UPHS Contact Tracer about your condition. You may either choose one at a time or all at once.`}</Text>
+                <Text style={styles.agreement}><Strong>One at a time</Strong> - A new question will only be asked once you have answered the previous question. A sample conversation between you and a contact tracer looks like this:</Text>
+                <Image source={require('../assets/images/one-at-a-time.png')} style={styles.sampleConvo} />
+                <Text style={styles.agreement}><Strong>All at once</Strong> - Questions will be compiled in a single message. A sample conversation between you and a contact tracer looks like this:</Text>
+                <Image source={require('../assets/images/all-at-once.png')} style={styles.sampleConvo} />
             </Modal>
 
            {isSignup && <Card style={styles.authContainer}>
@@ -492,7 +539,16 @@ const AuthScreen = props => {
                         }
                     
                     {!showOtp && 
-                    <View>                  
+                    <View>
+                        <View style={styles.spaceBetween}>
+                            <Text style={styles.formControlHeader}>Show Data Privacy Agreement</Text>
+                            <Ionicons
+                                name='help-circle'
+                                size={27}
+                                color="black"
+                                onPress={() => setAgreementModalVisible(true)}
+                            />
+                        </View>               
                         <Input 
                             field='contact_num'
                             label='Contact Number'
@@ -584,9 +640,17 @@ const AuthScreen = props => {
                             />)}
                         </View>
 
-                        <View>                       
+                        <View style={styles.wayOfInterviewContainer}>                       
                             <View style={styles.formGroup}>
-                                <Text style={styles.formControlHeader}>Preferred Way of Contact:</Text>
+                                <View style={styles.spaceBetween}>
+                                    <Text style={styles.formControlHeader}>Preferred Way of Interview:</Text>
+                                    <Ionicons
+                                        name='help-circle'
+                                        size={27}
+                                        color="black"
+                                        onPress={() => setInterviewModalVisible((prev) => !prev)}
+                                    />
+                                </View>
                                 {Platform.OS === 'android' ? <Picker
                                     selectedValue={signupForm['way_of_interview']}
                                     style={{ height: 50, width: 200}}
@@ -733,6 +797,9 @@ const styles = StyleSheet.create({
     startAndEndTimeContainer: {
         // height: 100
     },
+    wayOfInterviewContainer: {
+        marginTop: Dimensions.get('window').height > 800? 20: 16
+    },
     formGroup: {
         // marginTop: 0
         // borderColor: 'black',
@@ -829,6 +896,19 @@ const styles = StyleSheet.create({
         fontFamily: 'roboto-regular',
         color: '#3b9aff',
         textAlign: 'right'
+    },
+    sampleConvo: {
+        width: '100%',
+        height: undefined,
+        aspectRatio: 1,
+        resizeMode:'contain',
+        borderWidth: 1,
+        borderColor: '#DFE2E7',
+        marginBottom: Dimensions.get('window').height > 800? 12: 8,
+    },
+    link: {
+        color: '#525960',
+        textDecorationLine: 'underline'
     }
 })
 

@@ -37,7 +37,7 @@ const DataPrivacyModal = props => {
                         </View>
                         <ScrollView style={styles.form}>
                             {props.children}
-                            <View style={styles.submitContainer}>
+                            {!props.removeAgreeButton && <View style={styles.submitContainer}>
                                 <CustomButton
                                     heading={props.agreeText}
                                     headingFontSize={16}
@@ -46,7 +46,7 @@ const DataPrivacyModal = props => {
                                     // onPressHandler={() => console.log("I agreed")}
                                     onPressHandler={props.onAgree}
                                 />
-                            </View>
+                            </View>}
                         </ScrollView>
                     </View>
                 </View>

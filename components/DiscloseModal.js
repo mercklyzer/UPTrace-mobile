@@ -202,7 +202,7 @@ const DiscloseModal = props => {
                                 <CustomButton
                                     heading="Submit"
                                     headingFontSize={18}
-                                    buttonColor={Colors.maroon}
+                                    buttonColor={Colors.darkgreen}
                                     isDisabled={false}
                                     onPressHandler={submitHandler}
                                 />

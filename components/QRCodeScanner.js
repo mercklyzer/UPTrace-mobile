@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, ActivityIndicator, Dimensions, Platform } from 'react-native';
+import { View, Text, StyleSheet, Alert, ActivityIndicator, Dimensions, Platform, Image } from 'react-native';
 import { useDispatch, useSelector } from "react-redux";
 
 import { BarCodeScanner } from 'expo-barcode-scanner';
@@ -9,6 +9,7 @@ import moment from "moment";
 
 import Colors from '../constants/Colors';
 import * as scannerActions from '../store/actions/scanner';
+import Modal from '../components/Modal';
 
 const QRCodeScanner = props => {
     const [scannedBuilding, setScannedBuilding] = useState('')
@@ -17,6 +18,7 @@ const QRCodeScanner = props => {
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
     const [isWaitingResponse, setIsWaitingResponse] = useState(false);
+    const [successfulScanModalVisible, setSuccessfulScanModalVisible] = useState(false);
     
     const [camera, setCamera] = useState(null);
     const [imagePadding, setImagePadding] = useState(0);
@@ -88,7 +90,8 @@ const QRCodeScanner = props => {
 
     useEffect(() => {
         if(scannedBuilding !== '' && scannedRoom !== ''){
-            Alert.alert('Success', `Successfully scanned ${scannedBuilding} - ${scannedRoom}`, [{ text: 'Okay', onPress: props.switchTab }]);
+            // Alert.alert('Success', `Successfully scanned ${scannedBuilding} - ${scannedRoom}`, [{ text: 'Okay', onPress: props.switchTab }]);
+            setSuccessfulScanModalVisible(true);
         }
     }, [scannedBuilding, scannedRoom])
 
@@ -143,6 +146,25 @@ const QRCodeScanner = props => {
             {isWaitingResponse && <View style={styles.centered}>
                 <ActivityIndicator size='large' color={Colors.maroon} />
             </View>}
+            <Modal
+                header='Success'
+                visible={successfulScanModalVisible}
+                closeModal={() => {
+                    setSuccessfulScanModalVisible(false);
+                    props.switchTab();
+                }}
+                onAgree={() => {
+                    setSuccessfulScanModalVisible(false);
+                    props.switchTab();
+                }}
+                agreeText='Okay'
+                removeAgreeButton={true}
+            >
+                <View style={styles.successGifContainer}>
+                    <Image source={require('../assets/images/success.gif')} style={styles.successGif} />
+                </View>
+                <Text style={styles.successMessage}>Successfully scanned {scannedBuilding} - {scannedRoom}</Text>
+            </Modal>
         </View>
     );
 };
@@ -156,7 +178,24 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
-    }
+    },
+    successMessage: {
+        fontFamily: 'roboto-regular',
+        color: Colors.darkgreen,
+        fontSize: 16,
+        textAlign: 'center'
+    },
+    successGifContainer: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    successGif: {
+        width: '40%',
+        height: undefined,
+        aspectRatio: 1,
+        resizeMode:'contain',
+        marginBottom: Dimensions.get('window').height > 800? 10: 6
+    },
 });
 
 export default QRCodeScanner;
