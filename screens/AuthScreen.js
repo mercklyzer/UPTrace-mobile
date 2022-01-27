@@ -372,7 +372,7 @@ const AuthScreen = props => {
             })
         }
         catch(err){
-            Alert.alert("Error Occurred!", err.message, [{text: 'Okay!'}])
+            Alert.alert("Error Occurred!", err.message, [{text: 'Okay!', onPress: setAgreementModalVisible(false)}])
             setIsLoading(false)
         }
     }
@@ -468,24 +468,24 @@ const AuthScreen = props => {
                     <Strong>What information we collect and why we collect it</Strong>{'\n'}
                     <Text>UPTrace collects the following personal information upon registration, with the corresponding purpose:</Text>                    
                 </Text>
-                <View style={{ flexGrow: 1 }}>
+                <View style={styles.list}>
                     <MarkedList counterRenderer={disc}>
-                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Phone number</Strong> - to prevent fraud through a one-time PIN sent through SMS, and so that a user can be contacted if needed for contact tracing</Text>
-                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Password (encrypted)</Strong> - to secure your account</Text>
-                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Email address (only for Health Liaison Officers [HeLOs] and UP Health Service [UPHS] Contact Tracers)</Strong> - to identify a HeLO or a UPHS Contact Tracer and give them additional privileges in the application</Text>
-                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Preferred contact time</Strong> - to inform UPHS Contact Tracers of the start time and end time that you prefer to be contacted for monitoring and contact tracing </Text>
-                        <Text style={{ flexShrink: 1 }, styles.agreement}><Strong>Preferred way of interview</Strong> - to inform UPHS Contact Tracers of the way you prefer to be asked questions or to be interviewed for monitoring and contact tracing </Text>
+                        <Text style={{...styles.listItem, ...styles.agreement}}><Strong>Phone number</Strong> - to prevent fraud through a one-time PIN sent through SMS, and so that a user can be contacted if needed for contact tracing</Text>
+                        <Text style={{...styles.listItem, ...styles.agreement}}><Strong>Password (encrypted)</Strong> - to secure your account</Text>
+                        <Text style={{...styles.listItem, ...styles.agreement}}><Strong>Email address (only for Health Liaison Officers [HeLOs] and UP Health Service [UPHS] Contact Tracers)</Strong> - to identify a HeLO or a UPHS Contact Tracer and give them additional privileges in the application</Text>
+                        <Text style={{...styles.listItem, ...styles.agreement}}><Strong>Preferred contact time</Strong> - to inform UPHS Contact Tracers of the start time and end time that you prefer to be contacted for monitoring and contact tracing </Text>
+                        <Text style={{...styles.listItem, ...styles.agreement}}><Strong>Preferred way of interview</Strong> - to inform UPHS Contact Tracers of the way you prefer to be asked questions or to be interviewed for monitoring and contact tracing </Text>
                     </MarkedList>
                 </View>
                 <Text style={styles.agreement}>
                     Information about QR code scans are also collected, and this includes the user who scanned, the building and room visited, and the date and time of visit.{'\n\n'}
                     <Strong>How we collect, use, share, and retain your data</Strong>                 
                 </Text>
-                <View style={{ flexGrow: 1 }}>
+                <View style={styles.list}>
                     <MarkedList counterRenderer={decimal}>
-                        <Text style={{ flexShrink: 1 }, styles.agreement}>When signing up in UPTrace, we collect information enumerated in the “What information we collect” section.</Text>
-                        <Text style={{ flexShrink: 1 }, styles.agreement}>After successfully signing up, you may now scan QR codes in every entrance and exit points of establishments, as well as in every room you enter there. We save your scan logs in a server and these may be used for contact tracing purposes if necessary. These data are used to identify possible close contacts and to identify establishments that require thorough disinfection.</Text>
-                        <Text style={{ flexShrink: 1 }, styles.agreement}>If you suspect yourself to be positive of COVID-19 or if you tested positive, you may report it in the app and you will be prompted to indicate whether you have symptoms or not. If you do have symptoms, you will also be asked when your symptoms started. These information will then be disclosed to UPHS contact tracers so that they may assist you and perform contact tracing.</Text>
+                        <Text style={{...styles.listItem, ...styles.agreement}}>When signing up in UPTrace, we collect information enumerated in the “What information we collect” section.</Text>
+                        <Text style={{...styles.listItem, ...styles.agreement}}>After successfully signing up, you may now scan QR codes in every entrance and exit points of establishments, as well as in every room you enter there. We save your scan logs in a server and these may be used for contact tracing purposes if necessary. These data are used to identify possible close contacts and to identify establishments that require thorough disinfection.</Text>
+                        <Text style={{...styles.listItem, ...styles.agreement}}>If you suspect yourself to be positive of COVID-19 or if you tested positive, you may report it in the app and you will be prompted to indicate whether you have symptoms or not. If you do have symptoms, you will also be asked when your symptoms started. These information will then be disclosed to UPHS contact tracers so that they may assist you and perform contact tracing.</Text>
                     </MarkedList>
                 </View>
                 <Text style={styles.agreement}>
@@ -521,6 +521,9 @@ const AuthScreen = props => {
 
            {isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
+                    <View style={styles.logoContainer}>
+                        <Image source={require('../assets/images/uptrace-logo.png')} style={styles.logo} />
+                    </View>
                     {showOtp && <>
                     <Input 
                         field='otp'
@@ -539,16 +542,7 @@ const AuthScreen = props => {
                         }
                     
                     {!showOtp && 
-                    <View>
-                        <View style={styles.spaceBetween}>
-                            <Text style={styles.formControlHeader}>Show Data Privacy Agreement</Text>
-                            <Ionicons
-                                name='help-circle'
-                                size={27}
-                                color="black"
-                                onPress={() => setAgreementModalVisible(true)}
-                            />
-                        </View>               
+                    <View>            
                         <Input 
                             field='contact_num'
                             label='Contact Number'
@@ -711,7 +705,9 @@ const AuthScreen = props => {
 
             {!isSignup && <Card style={styles.authContainer}>
                 <ScrollView>
-
+                    <View style={styles.logoContainer}>
+                        <Image source={require('../assets/images/uptrace-logo.png')} style={styles.logo} />
+                    </View>
                     <View>                  
                         <Input 
                             field='contact_num'
@@ -785,7 +781,8 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginBottom: 30
     },
     authContainer: {
         width: '90%',
@@ -909,6 +906,23 @@ const styles = StyleSheet.create({
     link: {
         color: '#525960',
         textDecorationLine: 'underline'
+    },
+    list: {
+        flexGrow: 1
+    },
+    listItem: {
+        flexShrink: 1
+    },
+    logoContainer: {
+        alignSelf: 'center',
+        width: 200,
+        height: 60,
+        marginBottom: 15
+    },
+    logo: {
+        flex: 1,
+        width: undefined,
+        height: undefined
     }
 })
 
