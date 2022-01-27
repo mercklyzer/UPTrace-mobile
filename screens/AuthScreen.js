@@ -191,11 +191,11 @@ const AuthScreen = props => {
                 }
             }
             if(field === 'password' || field === 'confirm_password'){
-                if(!/([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,16})/g.test(text)){
+                if(!/^([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})$/.test(text)){
                     setSignupFormError((form) => {
                         return {
                             ...form,
-                            [field]: `Password should be 8 to 16 alphanumeric or special characters.`
+                            [field]: `Password should be 8 to 20 alphanumeric or special characters.`
                         }
                     })
                 }
@@ -276,11 +276,11 @@ const AuthScreen = props => {
                 }
             }
             if(field === 'password'){
-                if(!/([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,16})/g.test(text)){
+                if(!/^([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})$/.test(text)){
                     setLoginFormError((form) => {
                         return {
                             ...form,
-                            [field]: `Password should be 8 to 16 alphanumeric or special characters.`
+                            [field]: `Password should be 8 to 20 alphanumeric or special characters.`
                         }
                     })
                 }
