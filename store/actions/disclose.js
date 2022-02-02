@@ -1,8 +1,7 @@
-import Constants from "expo-constants";
+import getEnvVars from '../../environment';
 
-const { manifest } = Constants;
-
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+const { apiUrl } = getEnvVars();
+const uri = `${apiUrl}`;
 
 export const ADD_PATIENT = 'ADD_PATIENT';
 export const CHECK_IF_USER_IS_NEGATIVE = 'CHECK_IF_USER_IS_NEGATIVE';

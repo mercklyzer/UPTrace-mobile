@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Constants from "expo-constants";
+import getEnvVars from '../../environment';
 
-const { manifest } = Constants;
-
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+const { apiUrl } = getEnvVars();
+const uri = `${apiUrl}`;
 
 export const SIGNUP = 'SIGNUP'
 export const LOGIN = 'LOGIN'
