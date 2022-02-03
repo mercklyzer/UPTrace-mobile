@@ -1,7 +1,5 @@
-import getEnvVars from '../../environment';
 
-const { apiUrl } = getEnvVars();
-const uri = `${apiUrl}`;
+const uri = `google.com`;
 
 export const ADD_PATIENT = 'ADD_PATIENT';
 export const CHECK_IF_USER_IS_NEGATIVE = 'CHECK_IF_USER_IS_NEGATIVE';

@@ -1,7 +1,5 @@
-import getEnvVars from '../../environment';
 
-const { apiUrl } = getEnvVars();
-const uri = `${apiUrl}`;
+const uri = `google.com`
 
 export const ADD_LOG = 'ADD_LOG';
 

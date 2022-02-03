@@ -1,8 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import getEnvVars from '../../environment';
 
-const { apiUrl } = getEnvVars();
-const uri = `${apiUrl}`;
+const uri = `google.com`;
 
 export const SIGNUP = 'SIGNUP'
 export const LOGIN = 'LOGIN'
