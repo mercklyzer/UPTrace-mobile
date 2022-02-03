@@ -1,5 +1,10 @@
+import Constants from "expo-constants";
 
-const uri = `google.com`
+const { manifest } = Constants;
+
+const devUri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+const prodUri = 'http://uptraceapi-env.eba-qtswbmmy.ap-southeast-1.elasticbeanstalk.com';
+const uri = prodUri;
 
 export const ADD_LOG = 'ADD_LOG';
 
