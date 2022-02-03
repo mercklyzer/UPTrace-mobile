@@ -1,11 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+/* // FOR DEV MODE
 import Constants from "expo-constants";
 
 const { manifest } = Constants;
 
-const devUri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
-const prodUri = 'http://uptraceapi-env.eba-qtswbmmy.ap-southeast-1.elasticbeanstalk.com';
-const uri = prodUri;
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+*/
+
+const uri = 'http://uptraceapi-env.eba-qtswbmmy.ap-southeast-1.elasticbeanstalk.com';
 
 export const SIGNUP = 'SIGNUP'
 export const LOGIN = 'LOGIN'
