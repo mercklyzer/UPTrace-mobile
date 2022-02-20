@@ -20,6 +20,10 @@ const AuthScreen = props => {
     const [isSignup, setIsSignup] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
     const [showOtp, setShowOtp] = useState(false)
+    const [showSignupPassword, setShowSignupPassword] = useState(true)
+    const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(true)
+    const [showLoginPassword, setShowLoginPassword] = useState(true)
+
     const [otpExpiresIn, setOtpExpiresIn] = useState(0)
     const [otpTimeLeft, setOtpTimeLeft] = useState(-1)
     const [agreementModalVisible, setAgreementModalVisible] = useState(false); //modal
@@ -557,8 +561,11 @@ const AuthScreen = props => {
                         <Input 
                             field='password'
                             label='Password'
+                            isPassword={true}
+                            isPasswordVisible={showSignupPassword}
+                            setIsPasswordVisible={setShowSignupPassword}
                             keyboardType='default'
-                            secureTextEntry={true}
+                            secureTextEntry={showSignupPassword}
                             required
                             errorMessage={signupFormError['password']}
                             onInputChange={signupInputChangeHandler}
@@ -568,8 +575,11 @@ const AuthScreen = props => {
                         <Input 
                             field='confirm_password'
                             label='Confirm Password'
+                            isPassword={true}
+                            isPasswordVisible={showSignupConfirmPassword}
+                            setIsPasswordVisible={setShowSignupConfirmPassword}
                             keyboardType='default'
-                            secureTextEntry={true}
+                            secureTextEntry={showSignupConfirmPassword}
                             required
                             errorMessage={signupFormError['confirm_password']}
                             onInputChange={signupInputChangeHandler}
@@ -723,8 +733,11 @@ const AuthScreen = props => {
                         <Input 
                             field='password'
                             label='Password'
+                            isPassword={true}
+                            isPasswordVisible={showLoginPassword}
+                            setIsPasswordVisible={setShowLoginPassword}
                             keyboardType='default'
-                            secureTextEntry={true}
+                            secureTextEntry={showLoginPassword}
                             required
                             errorMessage={loginFormError['password']}
                             onInputChange={loginInputChangeHandler}
