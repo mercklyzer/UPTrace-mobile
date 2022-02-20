@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, ScrollView, RefreshControl, View, Image, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, ScrollView, RefreshControl, View, Image, ActivityIndicator, Alert } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons } from '@expo/vector-icons';
 import disc from '@jsamr/counter-style/presets/disc';
@@ -66,9 +66,8 @@ const DiscloseScreen = props => {
         setIsSubmitted(true);
     };
 
-    const closeAgreementModal = () => {
-        setAgreementModalVisible(false);
-        console.log("clicked close button");
+    const showAlert = () => {
+        Alert.alert("Status disclosed successfully", "Thank you for disclosing your status. Please self-isolate or quarantine at home, and wait for a UPHS contact tracer to communicate with you for further instructions.", [{text: 'Okay'}])
     };
 
     if(isCheckingStatus) {
@@ -118,9 +117,11 @@ const DiscloseScreen = props => {
                         }}
                     />
                 </View>
-                <View style={styles.smallTextContainer}>
-                    <Text style={styles.smallText, { textAlign: 'center' }}>The buttons above will only be enabled once a contact tracer has confirmed that you are negative for COVID-19.</Text>
-                </View>
+                {isUserPositive
+                    ? <View style={styles.smallTextContainer}>
+                        <Text style={styles.smallText, { textAlign: 'center' }}>The buttons above will only be enabled once a contact tracer has confirmed that you are negative for COVID-19.</Text>
+                    </View>
+                    : null}
                 <View style={styles.contentContainer}>
                     <Text style={styles.contentHeading}>UPTrace</Text>
                     <Text style={styles.contentText}>
@@ -168,6 +169,7 @@ const DiscloseScreen = props => {
                     token={token}
                     changeIsSubmitted={changeIsSubmitted}
                     closeModal={() => setVisible(false)}
+                    showAlert={() => showAlert()}
                 />
                 <Modal
                     header='Data Privacy Agreement'

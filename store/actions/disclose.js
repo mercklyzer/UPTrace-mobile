@@ -1,5 +1,11 @@
+// FOR DEV MODE
+import Constants from "expo-constants";
 
-const uri = `google.com`;
+const { manifest } = Constants;
+
+const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+
+// const uri = 'http://uptraceapi-env.eba-qtswbmmy.ap-southeast-1.elasticbeanstalk.com';
 
 export const ADD_PATIENT = 'ADD_PATIENT';
 export const CHECK_IF_USER_IS_NEGATIVE = 'CHECK_IF_USER_IS_NEGATIVE';
@@ -26,7 +32,7 @@ export const checkIfUserIsNegative = (contactNum, token) => {
         }
 
         const resData = await response.json();
-        // console.log("resData from disclose check if user is nega:", resData);
+        console.log("resData from disclose check if user is nega:", resData);
         return resData;
     };
 };
