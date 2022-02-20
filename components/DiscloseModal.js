@@ -107,6 +107,7 @@ const DiscloseModal = props => {
                 await dispatch(discloseActions.addPatient(props.userData, props.token, formData))
                 .then((patientObject) => {
                     props.closeModal();
+                    props.showAlert();
                     console.log('patientObject:', patientObject);
                     props.changeIsSubmitted();
                 })
