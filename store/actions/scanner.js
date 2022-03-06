@@ -1,11 +1,11 @@
 // FOR DEV MODE
-import Constants from "expo-constants";
+// import Constants from "expo-constants";
 
-const { manifest } = Constants;
+// const { manifest } = Constants;
 
-const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
+// const uri = `http://${manifest.debuggerHost.split(':').shift()}:3000`;
 
-// const uri = 'http://uptraceapi-env.eba-qtswbmmy.ap-southeast-1.elasticbeanstalk.com';
+const uri = 'https://uptrace-server.com';
 
 export const ADD_LOG = 'ADD_LOG';
 
