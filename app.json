@@ -24,7 +24,7 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.upd.uptrace",
+      "bundleIdentifier": "ph.edu.up.uptrace",
       "buildNumber": "1.0.0",
       "supportsTablet": true
     },
