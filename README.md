@@ -8,3 +8,7 @@ To install:
 1.) Make sure you are in this directory. <br />
 2.) Enter "npm i". <br />
 3.) Follow installation instructions found in Expo's documentation: https://docs.expo.dev/get-started/installation/
+
+Should you have any questions, you may contact the developers: <br />
+Lyzer Merck Bautista mercklyzer@gmail.com <br />
+Claudette Joy Celoso claudetteceloso@gmail.com
